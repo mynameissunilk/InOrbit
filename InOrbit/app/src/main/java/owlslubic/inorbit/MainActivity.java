@@ -3,6 +3,8 @@ package owlslubic.inorbit;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import owlslubic.inorbit.ApiServices.Endpoints;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -11,6 +13,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         /** hi sunil */
+
+        Endpoints.connectAPOD();
 
 
     }
