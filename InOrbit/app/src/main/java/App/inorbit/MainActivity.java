@@ -1,9 +1,9 @@
-package owlslubic.inorbit;
+package App.inorbit;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import owlslubic.inorbit.ApiServices.Endpoints;
+import App.inorbit.ApiServices.Endpoints;
 
 public class MainActivity extends AppCompatActivity {
 

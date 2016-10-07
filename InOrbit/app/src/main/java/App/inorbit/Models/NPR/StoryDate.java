@@ -1,12 +1,12 @@
 
-package owlslubic.inorbit.Models.NPR;
+package App.inorbit.Models.NPR;
 
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 
-public class Title_ {
+public class StoryDate {
 
     @SerializedName("$text")
     @Expose

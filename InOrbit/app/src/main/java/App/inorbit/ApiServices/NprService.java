@@ -1,6 +1,6 @@
-package owlslubic.inorbit.ApiServices;
+package App.inorbit.ApiServices;
 
-import owlslubic.inorbit.Models.NPR.ContentNpr;
+import App.inorbit.Models.NPR.ContentNpr;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;

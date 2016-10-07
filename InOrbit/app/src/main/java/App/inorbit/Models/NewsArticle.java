@@ -1,4 +1,4 @@
-package owlslubic.inorbit.Models;
+package App.inorbit.Models;
 
 /**
  * Created by owlslubic on 10/6/16.

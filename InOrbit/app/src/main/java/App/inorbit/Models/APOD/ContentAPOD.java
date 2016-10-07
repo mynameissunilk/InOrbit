@@ -1,5 +1,5 @@
 
-package owlslubic.inorbit.Models.APOD;
+package App.inorbit.Models.APOD;
 
 
 import com.google.gson.annotations.Expose;
