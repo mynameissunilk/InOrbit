@@ -13,11 +13,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // create a Client & Interceptor, pass it to api call methods in Endpoints
         OkHttpClient client = Endpoints.createClient();
 
-        Endpoints.connectAPOD(client);
-
+        /*
+        THE FOLLOWING ENDPOINTS WORK:
+        APOD, NYT, Guardian
+        */
 
     }
 }
-//6782245

@@ -3,6 +3,7 @@ package app.inorbit.ApiServices;
 import android.util.Log;
 
 import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import app.inorbit.Models.APOD.ContentAPOD;
 import retrofit2.Call;
@@ -16,6 +17,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class Endpoints {
+
+    private static String TAG = "NETWORK";
 
     // LaunchLibrary (for Rocket Launch Information)
     public static final String launchLibURL = "https://launchlibrary.net/1.1/";
@@ -51,7 +54,7 @@ public class Endpoints {
     public static final String guardianKey = "84a85242-3b93-42f2-8952-138f45f50dee";
 
     // The New York Times
-    public static final String nytURL = "https://api.nytimes.com/svc/search/v2/";
+    public static final String nytBaseURL = "https://api.nytimes.com/svc/search/v2/";
     public static final String nytKey ="4a3efda1da0840c5929ff4e7758f0b59";
     //"73f5f97cf52247a7a83b9f24299a23e2";
 
@@ -61,7 +64,7 @@ public class Endpoints {
 
     //etc.
 
-    // create one client, pass it to each request (save a few lines of code for each request method
+    // pass same client to each API Call
     public static OkHttpClient createClient(){
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS);
@@ -71,8 +74,46 @@ public class Endpoints {
                 .build();
         return client;
     }
+                      /** >>>>>[API CALLS BELOW]<<<<< **/
+                      // TODO: implement callbacks with POJO (so minor... these calls work which is what matters! )
+    public static void connectNYT(OkHttpClient client){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(nytBaseURL)
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
 
-    // API Call/Endpoint Methods
+        NytAPIService nytService = retrofit.create(NytAPIService.class);
+
+        String filterQuery = "document_type:article AND (news_desk:Science OR section_name:Science)";
+
+        // "headline,lead_paragraph,pub_date,web_url,multimedia"
+        String filterFields ="headline,lead_paragraph,pub_date,web_url,multimedia";
+
+        Call<ResponseBody> nytCall = nytService.getNYTArticles(
+                 "NASA",
+                 filterQuery,
+                 filterFields,
+                 nytKey
+         );
+         nytCall.enqueue(new Callback<ResponseBody>() {
+             @Override
+             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+                 if (response.isSuccessful()) {
+                     Log.i(TAG+"NYT","CONNECTED");
+                     // TODO: Log response.body() in terms of Java Model Objects
+                 }
+
+             }
+
+             @Override
+             public void onFailure(Call<ResponseBody> call, Throwable t) {
+                 Log.i(">>>>>NYT","CONNECTION FAILED");
+             }
+         });
+    }
+
     public static void connectAPOD(OkHttpClient client) {
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -90,10 +131,10 @@ public class Endpoints {
             public void onResponse(Call<ContentAPOD> call, Response<ContentAPOD> response) {
 
                 String apodTitle = response.body().getTitle();
-                String apodexplanation = response.body().getExplanation();
-                String apodUrl = response.body().getUrl();
+                // String apodexplanation = response.body().getExplanation();
+                // String apodUrl = response.body().getUrl();
 
-                  Log.i("APOD: ",apodTitle);
+                Log.i(TAG,apodTitle);
 
 
                 //return new APOD(apodTitle,apodexplanation,apodUrl);
@@ -107,7 +148,35 @@ public class Endpoints {
         });
     }
 
+    public static void connectGuardian(OkHttpClient client){
+// "http://content.guardianapis.com/search?section=science&order-by=newest&q=NASA&api-key=84a85242-3b93-42f2-8952-138f45f50dee"
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(guardianURL)
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
 
+        GuardianAPIService guardianService = retrofit.create(GuardianAPIService.class);
+        Call<ResponseBody> guardianCall = guardianService.getGuardianArticles(
+                "science",
+                "newest",
+                "NASA",
+                guardianKey
+        );
+        guardianCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if(response.isSuccessful()){
+                    Log.i(TAG+">>>>>GUARDIAN","CONNECTED ");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+    }
 
 
 }
