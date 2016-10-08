@@ -18,8 +18,9 @@ public class MainActivity extends AppCompatActivity {
 
         /*
         THE FOLLOWING ENDPOINTS WORK:
-        APOD, NYT, Guardian
+        APOD, NYT, Guardian, LaunchLibrary, Where is the ISS
         */
+        Endpoints.connectExtraVehicularActivity(client);
 
     }
 }

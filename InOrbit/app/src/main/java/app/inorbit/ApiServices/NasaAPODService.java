@@ -6,7 +6,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 
-public interface NasaApiService {
+public interface NasaAPODService {
     @GET("/planetary/apod")
     Call<ContentAPOD> getAPOD(@Query("api_key") String key);
 }

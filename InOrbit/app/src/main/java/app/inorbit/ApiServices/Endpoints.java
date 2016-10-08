@@ -21,27 +21,28 @@ public class Endpoints {
     private static String TAG = "NETWORK";
 
     // LaunchLibrary (for Rocket Launch Information)
-    public static final String launchLibURL = "https://launchlibrary.net/1.1/";
+    private static final String launchLibURL = "https://launchlibrary.net/1.1/";
 
     // ISS location API
-    public static final String issURL = "https://api.wheretheiss.at/v1/satellites/";
+    private static final String issURL = "https://api.wheretheiss.at/v1/satellites/";
 
     // Nasa Astronomy Picture of the Day
-    public static final String nasaAPODBaseURL = "https://api.nasa.gov/planetary/";
-    public static final String nasaAPODKey = "IsXUyhCSGkUP5QHrAAYITkO2PyqGeawPISAwZXRr";
+    private static final String nasaAPODBaseURL = "https://api.nasa.gov/planetary/";
+    private static final String nasaAPODKey = "IsXUyhCSGkUP5QHrAAYITkO2PyqGeawPISAwZXRr";
+
+    // Token for NASA's Socrata APIs (Extra-Vehicular Activity, Meteor Information, Near-Earth-Object Tracker
+    private static final String nasaDataToken = "Z8MdAeCnERprY22J6Bgv0UnLN";
 
     // NASA Near Earth Object Tracker (meteors, etc)
-    // full endpoint for getting Today's nearby objects: https://api.nasa.gov/neo/rest/v1/feed/today?detailed=true&api_key=KEY
-    public static final String nasaNearEarthObjBaseURL = "https://api.nasa.gov/neo/rest/v1/today/";
-    // TODO: get NASA app api key for the many nasa requests that we will make (not a big deal, but can't forget to do that either, now can we?
+    private static final String nasaNearEarthObjBaseURL = "https://api.nasa.gov/neo/rest/v1/feed/";
+
     // NASA: Meteorite Landings
-    // below url gets meteor "landings" whose masses are over 1million grams, we can showcase the largest meteors on earth recorded by man (so far)
     // https://data.nasa.gov/resource/y77d-th95.json?$where=mass>1000000
-    public static final String nasaMeteorBaseUrl = "https://data.nasa.gov/resource/y77d-th95.json/";
+    public static final String nasaMeteorBaseUrl = "https://data.nasa.gov/resource/";
 
     // NASA Extra-vehicular Activity(EVA) - US and Russia
-    public static final String nasaEVABaseURL = "https://data.nasa.gov/resource/q8u9-7uq7.json/";
-    // query endpoint is: "$where=eva>356" sigh, pass as query param or append to query? i'll figure it out later
+    public static final String nasaEVABaseURL = "https://data.nasa.gov/resource/";
+    // query endpoint is: "$where=eva>356"
 
 
 
@@ -50,19 +51,18 @@ public class Endpoints {
     public static final String nprKey = "MDI1OTA2MzQxMDE0NzEzODI2NTU4NjNkMA000";
 
     // The Guardian
-    public static final String guardianURL = "http://content.guardianapis.com/";
-    public static final String guardianKey = "84a85242-3b93-42f2-8952-138f45f50dee";
+    private static final String guardianURL = "http://content.guardianapis.com/";
+    private static final String guardianKey = "84a85242-3b93-42f2-8952-138f45f50dee";
 
     // The New York Times
-    public static final String nytBaseURL = "https://api.nytimes.com/svc/search/v2/";
-    public static final String nytKey ="4a3efda1da0840c5929ff4e7758f0b59";
+    private static final String nytBaseURL = "https://api.nytimes.com/svc/search/v2/";
+    private static final String nytKey ="4a3efda1da0840c5929ff4e7758f0b59";
     //"73f5f97cf52247a7a83b9f24299a23e2";
 
     // Twitter
 
     // Flickr
 
-    //etc.
 
     // pass same client to each API Call
     public static OkHttpClient createClient(){
@@ -122,7 +122,7 @@ public class Endpoints {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        NasaApiService nasaService = retrofit.create(NasaApiService.class);
+        NasaAPODService nasaService = retrofit.create(NasaAPODService.class);
 
         Call<ContentAPOD> call = nasaService.getAPOD(nasaAPODKey);
 
@@ -178,5 +178,126 @@ public class Endpoints {
         });
     }
 
+    public static void connectLaunchLibrary(OkHttpClient client){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(launchLibURL)
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        LaunchLibraryService launchService = retrofit.create(LaunchLibraryService.class);
+        Call<ResponseBody> launchCall = launchService.getLaunchDates();
+        launchCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if(response.isSuccessful()){
+                    Log.i(TAG+"LAUNCHLIBRARY", "CONNECTION SUCCESSFUL");
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+    }
+
+    public static void connectISSLocation(OkHttpClient client){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(issURL)
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        IssLocationService IssService = retrofit.create(IssLocationService.class);
+        Call<ResponseBody> issCall = IssService.getISSLocation();
+        issCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if(response.isSuccessful()){
+                    Log.i(TAG+"ISS LOCATION","SUCCESS<<<<<");
+                    Log.i("OUTPUT: ",response.body().toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+
+    }
+
+    public static void connectNeoService(OkHttpClient client){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(nasaNearEarthObjBaseURL)
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        NasaNEOService nasaService = retrofit.create(NasaNEOService.class);
+        Call<ResponseBody> nasaCall = nasaService.getNearEarthObjects(
+                nasaDataToken,
+                "true",
+                nasaAPODKey
+        );
+
+        nasaCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Log.i(TAG+"NASA","SUCCESS");
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+    }
+
+    public static void connectMeteorData(OkHttpClient client){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(nasaMeteorBaseUrl)
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        NasaSocrataService meteorService = retrofit.create(NasaSocrataService.class);
+        Call<ResponseBody>meteorCall = meteorService.getMeteorData(nasaDataToken);
+        meteorCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if(response.isSuccessful())
+                    Log.i(TAG+"METEORS","SUCCESS");
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+    }
+
+    public static void connectExtraVehicularActivity(OkHttpClient client){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(nasaEVABaseURL)
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        NasaSocrataService evaService = retrofit.create(NasaSocrataService.class);
+        Call<ResponseBody>evaCall = evaService.getEVAInfo(nasaDataToken);
+        evaCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if(response.isSuccessful())
+                    Log.i(TAG+"EVA","SUCCESSFUL !!! ");
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+    }
 
 }
