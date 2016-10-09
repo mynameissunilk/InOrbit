@@ -38,17 +38,15 @@ public class Endpoints {
 
     // NASA: Meteorite Landings
     // https://data.nasa.gov/resource/y77d-th95.json?$where=mass>1000000
-    public static final String nasaMeteorBaseUrl = "https://data.nasa.gov/resource/";
+    private static final String nasaMeteorBaseUrl = "https://data.nasa.gov/resource/";
 
     // NASA Extra-vehicular Activity(EVA) - US and Russia
-    public static final String nasaEVABaseURL = "https://data.nasa.gov/resource/";
+    private static final String nasaEVABaseURL = "https://data.nasa.gov/resource/";
     // query endpoint is: "$where=eva>356"
 
-
-
     // NPR
-    public static final String nprURL = "http://api.npr.org/";
-    public static final String nprKey = "MDI1OTA2MzQxMDE0NzEzODI2NTU4NjNkMA000";
+    private static final String nprURL = "http://api.npr.org/";
+    private static final String nprKey = "MDI1OTA2MzQxMDE0NzEzODI2NTU4NjNkMA000";
 
     // The Guardian
     private static final String guardianURL = "http://content.guardianapis.com/";
@@ -64,7 +62,7 @@ public class Endpoints {
     // Flickr
 
 
-    // pass same client to each API Call
+    // Pass the same client to each API Call
     public static OkHttpClient createClient(){
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS);
@@ -74,8 +72,9 @@ public class Endpoints {
                 .build();
         return client;
     }
-                      /** >>>>>[API CALLS BELOW]<<<<< **/
-                      // TODO: implement callbacks with POJO (so minor... these calls work which is what matters! )
+
+    /** >>>>>[API CALLS BELOW]<<<<< **/
+
     public static void connectNYT(OkHttpClient client){
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(nytBaseURL)
@@ -168,6 +167,38 @@ public class Endpoints {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if(response.isSuccessful()){
                     Log.i(TAG+">>>>>GUARDIAN","CONNECTED ");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+    }
+
+    public static void connectNPR(OkHttpClient client){
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(nprURL)
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        NprAPIService nprService = retrofit.create(NprAPIService.class);
+        Call<ResponseBody> nprCall = nprService.getArticle(
+                1026,
+                "title,storyDate,text,image",
+                "JSON",
+                10,
+                nprKey
+        );
+
+        nprCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    Log.i(TAG+"NPR>>>>>>>","SUCCESSFUL");
                 }
             }
 
