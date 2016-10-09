@@ -5,7 +5,7 @@ import android.util.Log;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
-import app.inorbit.Models.APOD.ContentAPOD;
+import app.inorbit.Models.NASAAPOD.ContentAPOD;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;

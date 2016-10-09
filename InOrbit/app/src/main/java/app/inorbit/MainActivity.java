@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
         THE FOLLOWING ENDPOINTS WORK:
         APOD, NYT, Guardian, LaunchLibrary, Where is the ISS
         */
-        Endpoints.connectNPR(client);
+        Endpoints.connectNeoService(client);
 
     }
 }

@@ -1,5 +1,5 @@
 
-package app.inorbit.Models.APOD;
+package app.inorbit.Models.NASAAPOD;
 
 
 import com.google.gson.annotations.Expose;
