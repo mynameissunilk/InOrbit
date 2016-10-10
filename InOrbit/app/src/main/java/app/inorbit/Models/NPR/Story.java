@@ -1,13 +1,13 @@
 
 package app.inorbit.Models.NPR;
 
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
-import java.util.List;
-
-
+@Generated("org.jsonschema2pojo")
 public class Story {
 
     @SerializedName("id")
@@ -25,6 +25,9 @@ public class Story {
     @SerializedName("text")
     @Expose
     private Text text;
+    @SerializedName("image")
+    @Expose
+    private List<Image> image = new ArrayList<Image>();
 
     /**
      * 
@@ -114,6 +117,24 @@ public class Story {
      */
     public void setText(Text text) {
         this.text = text;
+    }
+
+    /**
+     * 
+     * @return
+     *     The image
+     */
+    public List<Image> getImage() {
+        return image;
+    }
+
+    /**
+     * 
+     * @param image
+     *     The image
+     */
+    public void setImage(List<Image> image) {
+        this.image = image;
     }
 
 }

@@ -1,19 +1,21 @@
 
-package app.inorbit.Models.NPR;
+package app.inorbit.Models.NASAMeteor;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 @Generated("org.jsonschema2pojo")
-public class Link {
+public class Geolocation {
 
     @SerializedName("type")
     @Expose
     private String type;
-    @SerializedName("$text")
+    @SerializedName("coordinates")
     @Expose
-    private String $text;
+    private List<Double> coordinates = new ArrayList<Double>();
 
     /**
      * 
@@ -36,19 +38,19 @@ public class Link {
     /**
      * 
      * @return
-     *     The $text
+     *     The coordinates
      */
-    public String get$text() {
-        return $text;
+    public List<Double> getCoordinates() {
+        return coordinates;
     }
 
     /**
      * 
-     * @param $text
-     *     The $text
+     * @param coordinates
+     *     The coordinates
      */
-    public void set$text(String $text) {
-        this.$text = $text;
+    public void setCoordinates(List<Double> coordinates) {
+        this.coordinates = coordinates;
     }
 
 }

@@ -19,7 +19,7 @@ import javax.crypto.spec.SecretKeySpec;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
-import app.inorbit.Models.APOD.ContentAPOD;
+import app.inorbit.Models.NASAAPOD.ContentAPOD;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -52,16 +52,19 @@ public class Endpoints {
 
     // NASA: Meteorite Landings
     // https://data.nasa.gov/resource/y77d-th95.json?$where=mass>1000000
-    public static final String nasaMeteorBaseUrl = "https://data.nasa.gov/resource/";
+    private static final String nasaMeteorBaseUrl = "https://data.nasa.gov/resource/";
 
     // NASA Extra-vehicular Activity(EVA) - US and Russia
-    public static final String nasaEVABaseURL = "https://data.nasa.gov/resource/";
+    private static final String nasaEVABaseURL = "https://data.nasa.gov/resource/";
     // query endpoint is: "$where=eva>356"
 
-
+//<<<<<<< HEAD
+//
+//=======
+//>>>>>>> 414face258e22666c0dfa694e93115dd0ddf8946
     // NPR
-    public static final String nprURL = "http://api.npr.org/";
-    public static final String nprKey = "MDI1OTA2MzQxMDE0NzEzODI2NTU4NjNkMA000";
+    private static final String nprURL = "http://api.npr.org/";
+    private static final String nprKey = "MDI1OTA2MzQxMDE0NzEzODI2NTU4NjNkMA000";
 
     // The Guardian
     private static final String guardianURL = "http://content.guardianapis.com/";
@@ -92,8 +95,13 @@ public class Endpoints {
     // Flickr
 
 
+//<<<<<<< HEAD***
     // pass same client to each API Call
-    public static OkHttpClient createClient() {
+//    public static OkHttpClient createClient() {
+//=======***
+    // Pass the same client to each API Call
+    public static OkHttpClient createClient(){
+//>>>>>>> 414face258e22666c0dfa694e93115dd0ddf8946
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS);
 
@@ -103,11 +111,11 @@ public class Endpoints {
         return client;
     }
 
-    /**
-     * >>>>>[API CALLS BELOW]<<<<<
-     **/
-    // TODO: implement callbacks with POJO (so minor... these calls work which is what matters! )
-    public static void connectNYT(OkHttpClient client) {
+
+
+    /** >>>>>[API CALLS BELOW]<<<<< **/
+
+    public static void connectNYT(OkHttpClient client){
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(nytBaseURL)
                 .client(client)
@@ -209,7 +217,41 @@ public class Endpoints {
         });
     }
 
-    public static void connectLaunchLibrary(OkHttpClient client) {
+
+    public static void connectNPR(OkHttpClient client){
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(nprURL)
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        NprAPIService nprService = retrofit.create(NprAPIService.class);
+        Call<ResponseBody> nprCall = nprService.getArticle(
+                1026,
+                "title,storyDate,text,image",
+                "JSON",
+                10,
+                nprKey
+        );
+
+        nprCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    Log.i(TAG+"NPR>>>>>>>","SUCCESSFUL");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+    }
+
+    public static void connectLaunchLibrary(OkHttpClient client){
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(launchLibURL)
                 .client(client)
@@ -331,90 +373,6 @@ public class Endpoints {
         });
     }
 
-    /*public static void connectTwitter(OkHttpClient client) throws UnsupportedEncodingException {
-        String signature = "";//must be generated
-        String uuidString = UUID.randomUUID().toString();
-        uuidString = uuidString.replaceAll("-","");
-        twitterOauthCallbackURL = URLEncoder.encode("https://alicelubic.github.io","UTF-8");
-
-        //this string might be good as is, might need & instead of,
-        String oauthString = "OAuth oauth_callback=\"" + twitterOauthCallbackURL +
-                "\", oauth_consumer_key=\"" + twitterConsumerKey +
-                "\",oauth_nonce=\"" + UUID.randomUUID().toString() +
-                "\",oauth_signature=\"" + signature +
-                "\",oauth_signature_method=\"HMAC-SHA1\",oauth_timestamp=\"" + String.valueOf(System.currentTimeMillis()) +
-                "\",oauth_version=\"1.0a\"";
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(twitterBaseURL)
-                .client(client)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        TwitterAPIService twitterService = retrofit.create(TwitterAPIService.class);
-
-        Call<ResponseBody> requestTokenCall = twitterService.requestToken(oauthString);
-        requestTokenCall.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                Log.i(TAG + "TWITTER", "REQUEST TOKEN CALL SUCCESS");
-
-                try {
-                    JSONObject object = new JSONObject(response.body().toString());
-                    boolean callbackConfirmed = object.getBoolean("oauth_callback_confirmed");
-                    if (callbackConfirmed) {
-                        //verify it's good, store other values
-                        twitterRequestToken = object.getString("oauth_token");
-                        twitterRequestTokenSecret = object.getString("oauth_token_secret");
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                //now that we have the oauth token and secret,
-                // we redirect the user to sign in via WebView to:
-                //"https://api.twitter.com/oauth/authenticate?oauth_token="+ twitterOauthRequestToken;
-
-                // if auth is successful, my callback_url receives a request containing oauth_token and oauth_verifier
-                //TODO verify that that token matches the one that i received above, store both values for converting to access token
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.d(TAG + "TWITTER", "REQUEST TOKEN CALL FAILED onFailure: " + t.getMessage());
-            }
-        });
-        /*
-
-        Call<ResponseBody> getAccessToken = twitterService.convertToAccessToken(oauthString, twitterOauthVerifier);
-        getAccessToken.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                Log.i(TAG + "TWITTER", "ACCESS TOKEN CALL SUCCESS");
-
-                try {
-                    JSONObject object = new JSONObject(response.body().string());
-
-                    twitterAccessToken = object.getString("oauth_token");
-                    twitterAccessTokenSecret = object.getString("oauth_token_secret");
-                    // we store these values and can use them if we need to do
-                    // GET account/verify_credentials if we ever should need to
-
-
-                } catch (JSONException | IOException e) {
-                    e.printStackTrace();
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.d(TAG + "TWITTER", "ACCESS TOKEN CALL FAILED onFailure: " + t.getMessage());
-
-            }
-        });
-
-
-    }*/
 
 
 

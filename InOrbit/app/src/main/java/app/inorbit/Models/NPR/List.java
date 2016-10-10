@@ -1,12 +1,12 @@
 
 package app.inorbit.Models.NPR;
 
+import java.util.ArrayList;
+import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
-
-
+@Generated("org.jsonschema2pojo")
 public class List {
 
     @SerializedName("title")

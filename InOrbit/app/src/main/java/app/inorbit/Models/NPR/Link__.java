@@ -6,28 +6,28 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 @Generated("org.jsonschema2pojo")
-public class Teaser {
+public class Link__ {
 
-    @SerializedName("$text")
+    @SerializedName("url")
     @Expose
-    private String $text;
+    private String url;
 
     /**
      * 
      * @return
-     *     The $text
+     *     The url
      */
-    public String get$text() {
-        return $text;
+    public String getUrl() {
+        return url;
     }
 
     /**
      * 
-     * @param $text
-     *     The $text
+     * @param url
+     *     The url
      */
-    public void set$text(String $text) {
-        this.$text = $text;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
 }

@@ -1,11 +1,12 @@
 
 package app.inorbit.Models.NPR;
 
-
+import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class ContentNpr {
+@Generated("org.jsonschema2pojo")
+public class ContentNPR {
 
     @SerializedName("version")
     @Expose
