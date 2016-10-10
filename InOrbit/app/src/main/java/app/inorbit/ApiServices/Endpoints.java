@@ -71,6 +71,7 @@ public class Endpoints {
     private static final String flickrBaseURL = "https://api.flickr.com/services/";
     private static final String flickrKey = "ab85ab5194463ca32b34588c6bb881cc";
     private static final String flickrSecretKey = "f7cf4b2166d68879";
+    private static final String flickrAuthURL = "https://www.flickr.com/auth-72157674899282716";
 
     // Pass the same client to each API Call
     public static OkHttpClient createClient(){
@@ -349,19 +350,12 @@ public class Endpoints {
                 .build();
 
         FlickrAPIService flickrService = retrofit.create(FlickrAPIService.class);
-        Call<ResponseBody> flickrCall = flickrService.getImages(
-                "flickr.people.getPhotos",
-                flickrKey,
-                "gsfc",
-                1,
-                20,
-                "json"
-        );
-        flickrCall.enqueue(new Callback<ResponseBody>() {
+        Call<ResponseBody> tokenCall = flickrService.getRequestToken(flickrKey,"HMA-SHA1");
+        tokenCall.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if(response.isSuccessful())
-                    Log.i(TAG+">>>>>>>>FLICKR","CONNECTION SUCCESSFUL");
+                    Log.i("SUCCESS<<<<<","SUCCESS");
             }
 
             @Override

@@ -11,6 +11,12 @@ import retrofit2.http.Query;
 
 public interface FlickrAPIService {
 
+    @GET("oauth/request_token")
+    Call<ResponseBody> getRequestToken(
+            @Query("oauth_consumer_key") String consumerKey,
+            @Query("signature_method") String method
+    );
+
     @GET("rest")
     Call<ResponseBody> getImages(
             @Query("method") String method, // flickr.people.getPhotos
