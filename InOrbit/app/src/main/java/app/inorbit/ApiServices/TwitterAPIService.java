@@ -23,6 +23,21 @@ import retrofit2.http.Query;
 
 public interface TwitterAPIService {
 
+
+    @POST("oauth2/token")
+    Call<ResponseBody> authorizeApplication(@Header("Authorization") String authorization,
+                                            @Header("Content-Type") String contentType,
+                                            @Query("grant_type") String grantType);
+
+    @GET("1.1/statuses/user_timeline.json")
+    Call<ResponseBody> userTimeline(@Header("Authorization") String authorization,
+                                    @Query("screen_name") String screenName,
+                                    @Query("count") int count);
+
+
+
+
+    /* these are for the sign in auth */
     @POST("oauth/request_token")
     Call<ResponseBody> obtainRequestToken(@Header("Authorization") String authorizationHeader
     );

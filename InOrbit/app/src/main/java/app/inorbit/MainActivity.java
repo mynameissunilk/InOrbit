@@ -6,7 +6,6 @@ import android.os.Bundle;
 import java.io.UnsupportedEncodingException;
 
 import app.inorbit.ApiServices.Endpoints;
-import app.inorbit.ApiServices.TempTwitterClass;
 import okhttp3.OkHttpClient;
 
 public class MainActivity extends AppCompatActivity {
@@ -20,11 +19,7 @@ public class MainActivity extends AppCompatActivity {
         OkHttpClient client = Endpoints.createClient();
 
 
-        try {
-            TempTwitterClass.connectTwitter(client,this);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+        Endpoints.connectTwitter(client);
 
 
 

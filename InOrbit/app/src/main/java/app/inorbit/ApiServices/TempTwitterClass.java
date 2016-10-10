@@ -1,3 +1,4 @@
+/*
 package app.inorbit.ApiServices;
 
 import android.content.Context;
@@ -31,6 +32,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class TempTwitterClass {
     //it was just too much of a mess to put in the Endpoints class.... until i can sort it out and clean it up
+
+
+
+*/
+/**//*
+
+
 
     private static final String TAG = "TempTwitterClass";
 
@@ -100,7 +108,9 @@ public class TempTwitterClass {
         twitterService = retrofit.create(TwitterAPIService.class);
 
 
-        /** >>>>OBTAIN REQUEST_TOKEN<<<< **/
+        */
+/** >>>>OBTAIN REQUEST_TOKEN<<<< **//*
+
         Call<ResponseBody> requestTokenCall = twitterService.obtainRequestToken(authorizationHeader);
         requestTokenCall.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -119,13 +129,17 @@ public class TempTwitterClass {
 
 
                         //now that we have the oauth token and secret,
-                        /**>>>>REDIRECT USER TO SIGN IN<<<<**/
+                        */
+/**>>>>REDIRECT USER TO SIGN IN<<<<**//*
+
                         String authUrl = "https://api.twitter.com/oauth/authenticate?oauth_token=" + twitterRequestToken;
                         Intent intent = new Intent(Intent.ACTION_VIEW);
                         intent.setData(Uri.parse(authUrl));
                         context.startActivity(intent);
 
-                        /** >>>>AUTHENTICATE USER, GET OAUTH_VERIFIER<<<< **/
+                        */
+/** >>>>AUTHENTICATE USER, GET OAUTH_VERIFIER<<<< **//*
+
                         authenticateUser(twitterRequestToken);
 
                     }
@@ -164,7 +178,9 @@ public class TempTwitterClass {
                         twitterOauthVerifier = object.getString("oauth_verifier");
                         Log.i(TAG, "AUTHENTICATEUSER: OAUTH VERIFIER = "+twitterOauthVerifier);
 
-                        /**>>>>CONVERT REQUEST_TOKEN TO ACCESS_TOKEN<<<<**/
+                        */
+/**>>>>CONVERT REQUEST_TOKEN TO ACCESS_TOKEN<<<<**//*
+
                         convertToken(twitterOauthVerifier);
                     }
 
@@ -269,3 +285,4 @@ public class TempTwitterClass {
 
 
 }
+*/

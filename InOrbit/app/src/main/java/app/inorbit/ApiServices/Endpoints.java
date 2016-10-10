@@ -1,6 +1,13 @@
 package app.inorbit.ApiServices;
 
+import android.util.Base64;
 import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 import app.inorbit.Models.Guardian.ContentGuardian;
 import app.inorbit.Models.ISS.ContentISS;
@@ -52,10 +59,6 @@ public class Endpoints {
     private static final String nasaEVABaseURL = "https://data.nasa.gov/resource/";
     // query endpoint is: "$where=eva>356"
 
-    //<<<<<<< HEAD
-//
-//=======
-//>>>>>>> 414face258e22666c0dfa694e93115dd0ddf8946
     // NPR
     private static final String nprURL = "http://api.npr.org/";
     private static final String nprKey = "MDI1OTA2MzQxMDE0NzEzODI2NTU4NjNkMA000";
@@ -76,7 +79,8 @@ public class Endpoints {
      **/
     private static final String twitterConsumerKey = "AuUt4iH82LU1EYhfTfaxlIpWR";
     private static final String twitterConsumerSecret = "YSKdNHcy5n731hDrIreTpKMNWOrtgHJbgIpdS0USuxxm29Zj7m";
-
+    private static final String twitterBaseURL = "https://api.twitter.com/";
+    private static String twitterAccessToken;
 
     // Flickr
     private static final String flickrBaseURL = "https://api.flickr.com/services/";
@@ -88,7 +92,9 @@ public class Endpoints {
     // Pass the same client to each API Call
     public static OkHttpClient createClient() {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS);
+//        interceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS);
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(interceptor) // the logging interceptor
@@ -391,4 +397,94 @@ public class Endpoints {
         });
     }
 
+    public static void connectTwitter(final OkHttpClient client) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(twitterBaseURL)
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        TwitterAPIService twitterService = retrofit.create(TwitterAPIService.class);
+
+
+        /**>>>FIRST we obtain the bearer token<<<**/
+        String notEncodedString = twitterConsumerKey + ":" + twitterConsumerSecret;
+        byte[] data = new byte[0];
+        try {
+            data = notEncodedString.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        String encodedString = Base64.encodeToString(data, Base64.NO_WRAP);
+
+
+        Call<ResponseBody> authorizationCall = twitterService.authorizeApplication("Basic " + encodedString, "application/x-www-form-urlencoded;charset=UTF-8", "client_credentials");
+        authorizationCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Log.i(TAG + " TWITTER", "SUCCESS");
+                try {
+                    String responseString = response.body().string();
+                    Log.d(TAG + " TWITTER", "Bearer Token: " + responseString);
+                    JSONObject object = new JSONObject(responseString);
+                    twitterAccessToken = object.getString("access_token");
+                    Log.d(TAG + " TWITTER", "Access Token: " + twitterAccessToken);
+
+                    /**>>>>NEXT we do the GET request<<<<**/
+                    getTweets(client, twitterAccessToken);
+
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.d(TAG + " TWITTER", "Bearer token call failed: " + t.getMessage().toString());
+            }
+        });
+
+
+    }
+
+    public static void getTweets(OkHttpClient client, String accessToken) {
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(twitterBaseURL)
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        TwitterAPIService twitterService = retrofit.create(TwitterAPIService.class);
+
+
+        //and the auth header is passed Bearer instead of Basic this time, because we have it!
+        if (accessToken != null) {
+            Call<ResponseBody> getTweetsCall = twitterService.userTimeline("Bearer " + accessToken, "NASA_Astronauts", 2);
+            getTweetsCall.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    Log.d(TAG + " TWITTER", "GET TWEETS CALL SUCCESS!");
+
+                    try {
+                        Log.d(TAG + " TWITTER", "RESPONSE: " + response.body().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Log.d(TAG + " TWITTER", "GET TWEETS CALL FAILED: " + t.getMessage().toString());
+
+                }
+            });
+        }
+    }
 }
+
+
+
+
+
