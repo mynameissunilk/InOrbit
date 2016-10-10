@@ -2,6 +2,14 @@ package app.inorbit.ApiServices;
 
 import android.util.Log;
 
+import app.inorbit.Models.Guardian.ContentGuardian;
+import app.inorbit.Models.ISS.ContentISS;
+import app.inorbit.Models.LaunchLibrary.ContentLaunchLibrary;
+import app.inorbit.Models.NASAExtraVehic.ContentNASAEVA;
+import app.inorbit.Models.NASAMeteor.ContentNASAMeteor;
+import app.inorbit.Models.NASANEO.ContentNASANEO;
+import app.inorbit.Models.NPR.ContentNPR;
+import app.inorbit.Models.NYT.ContentNYT;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -60,7 +68,9 @@ public class Endpoints {
     // Twitter
 
     // Flickr
-
+    private static final String flickrBaseURL = "https://api.flickr.com/services/";
+    private static final String flickrKey = "ab85ab5194463ca32b34588c6bb881cc";
+    private static final String flickrSecretKey = "f7cf4b2166d68879";
 
     // Pass the same client to each API Call
     public static OkHttpClient createClient(){
@@ -89,15 +99,15 @@ public class Endpoints {
         // "headline,lead_paragraph,pub_date,web_url,multimedia"
         String filterFields ="headline,lead_paragraph,pub_date,web_url,multimedia";
 
-        Call<ResponseBody> nytCall = nytService.getNYTArticles(
+        Call<ContentNYT> nytCall = nytService.getNYTArticles(
                  "NASA",
                  filterQuery,
                  filterFields,
                  nytKey
          );
-         nytCall.enqueue(new Callback<ResponseBody>() {
+         nytCall.enqueue(new Callback<ContentNYT>() {
              @Override
-             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+             public void onResponse(Call<ContentNYT> call, Response<ContentNYT> response) {
 
                  if (response.isSuccessful()) {
                      Log.i(TAG+"NYT","CONNECTED");
@@ -107,7 +117,7 @@ public class Endpoints {
              }
 
              @Override
-             public void onFailure(Call<ResponseBody> call, Throwable t) {
+             public void onFailure(Call<ContentNYT> call, Throwable t) {
                  Log.i(">>>>>NYT","CONNECTION FAILED");
              }
          });
@@ -156,22 +166,22 @@ public class Endpoints {
                 .build();
 
         GuardianAPIService guardianService = retrofit.create(GuardianAPIService.class);
-        Call<ResponseBody> guardianCall = guardianService.getGuardianArticles(
+        Call<ContentGuardian> guardianCall = guardianService.getGuardianArticles(
                 "science",
                 "newest",
                 "NASA",
                 guardianKey
         );
-        guardianCall.enqueue(new Callback<ResponseBody>() {
+        guardianCall.enqueue(new Callback<ContentGuardian>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(Call<ContentGuardian> call, Response<ContentGuardian> response) {
                 if(response.isSuccessful()){
                     Log.i(TAG+">>>>>GUARDIAN","CONNECTED ");
                 }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<ContentGuardian> call, Throwable t) {
 
             }
         });
@@ -186,7 +196,7 @@ public class Endpoints {
                 .build();
 
         NprAPIService nprService = retrofit.create(NprAPIService.class);
-        Call<ResponseBody> nprCall = nprService.getArticle(
+        Call<ContentNPR> nprCall = nprService.getArticle(
                 1026,
                 "title,storyDate,text,image",
                 "JSON",
@@ -194,16 +204,16 @@ public class Endpoints {
                 nprKey
         );
 
-        nprCall.enqueue(new Callback<ResponseBody>() {
+        nprCall.enqueue(new Callback<ContentNPR>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(Call<ContentNPR> call, Response<ContentNPR> response) {
                 if (response.isSuccessful()) {
                     Log.i(TAG+"NPR>>>>>>>","SUCCESSFUL");
                 }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<ContentNPR> call, Throwable t) {
 
             }
         });
@@ -217,10 +227,10 @@ public class Endpoints {
                 .build();
 
         LaunchLibraryService launchService = retrofit.create(LaunchLibraryService.class);
-        Call<ResponseBody> launchCall = launchService.getLaunchDates();
-        launchCall.enqueue(new Callback<ResponseBody>() {
+        Call<ContentLaunchLibrary> launchCall = launchService.getLaunchDates();
+        launchCall.enqueue(new Callback<ContentLaunchLibrary>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(Call<ContentLaunchLibrary> call, Response<ContentLaunchLibrary> response) {
                 if(response.isSuccessful()){
                     Log.i(TAG+"LAUNCHLIBRARY", "CONNECTION SUCCESSFUL");
 
@@ -228,7 +238,7 @@ public class Endpoints {
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<ContentLaunchLibrary> call, Throwable t) {
 
             }
         });
@@ -242,10 +252,10 @@ public class Endpoints {
                 .build();
 
         IssLocationService IssService = retrofit.create(IssLocationService.class);
-        Call<ResponseBody> issCall = IssService.getISSLocation();
-        issCall.enqueue(new Callback<ResponseBody>() {
+        Call<ContentISS> issCall = IssService.getISSLocation();
+        issCall.enqueue(new Callback<ContentISS>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(Call<ContentISS> call, Response<ContentISS> response) {
                 if(response.isSuccessful()){
                     Log.i(TAG+"ISS LOCATION","SUCCESS<<<<<");
                     Log.i("OUTPUT: ",response.body().toString());
@@ -253,7 +263,7 @@ public class Endpoints {
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<ContentISS> call, Throwable t) {
 
             }
         });
@@ -268,20 +278,20 @@ public class Endpoints {
                 .build();
 
         NasaNEOService nasaService = retrofit.create(NasaNEOService.class);
-        Call<ResponseBody> nasaCall = nasaService.getNearEarthObjects(
+        Call<ContentNASANEO> nasaCall = nasaService.getNearEarthObjects(
                 nasaDataToken,
                 "true",
                 nasaAPODKey
         );
 
-        nasaCall.enqueue(new Callback<ResponseBody>() {
+        nasaCall.enqueue(new Callback<ContentNASANEO>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(Call<ContentNASANEO> call, Response<ContentNASANEO> response) {
                 Log.i(TAG+"NASA","SUCCESS");
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<ContentNASANEO> call, Throwable t) {
 
             }
         });
@@ -294,16 +304,16 @@ public class Endpoints {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         NasaSocrataService meteorService = retrofit.create(NasaSocrataService.class);
-        Call<ResponseBody>meteorCall = meteorService.getMeteorData(nasaDataToken);
-        meteorCall.enqueue(new Callback<ResponseBody>() {
+        Call<ContentNASAMeteor>meteorCall = meteorService.getMeteorData(nasaDataToken);
+        meteorCall.enqueue(new Callback<ContentNASAMeteor>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(Call<ContentNASAMeteor> call, Response<ContentNASAMeteor> response) {
                 if(response.isSuccessful())
                     Log.i(TAG+"METEORS","SUCCESS");
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<ContentNASAMeteor> call, Throwable t) {
 
             }
         });
@@ -316,12 +326,42 @@ public class Endpoints {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         NasaSocrataService evaService = retrofit.create(NasaSocrataService.class);
-        Call<ResponseBody>evaCall = evaService.getEVAInfo(nasaDataToken);
-        evaCall.enqueue(new Callback<ResponseBody>() {
+        Call<ContentNASAEVA>evaCall = evaService.getEVAInfo(nasaDataToken);
+        evaCall.enqueue(new Callback<ContentNASAEVA>() {
+            @Override
+            public void onResponse(Call<ContentNASAEVA> call, Response<ContentNASAEVA> response) {
+                if(response.isSuccessful())
+                    Log.i(TAG+"EVA","SUCCESSFUL !!! ");
+            }
+
+            @Override
+            public void onFailure(Call<ContentNASAEVA> call, Throwable t) {
+
+            }
+        });
+    }
+
+    public static void connectFlickr(OkHttpClient client){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(flickrBaseURL)
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        FlickrAPIService flickrService = retrofit.create(FlickrAPIService.class);
+        Call<ResponseBody> flickrCall = flickrService.getImages(
+                "flickr.people.getPhotos",
+                flickrKey,
+                "gsfc",
+                1,
+                20,
+                "json"
+        );
+        flickrCall.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if(response.isSuccessful())
-                    Log.i(TAG+"EVA","SUCCESSFUL !!! ");
+                    Log.i(TAG+">>>>>>>>FLICKR","CONNECTION SUCCESSFUL");
             }
 
             @Override
@@ -330,5 +370,4 @@ public class Endpoints {
             }
         });
     }
-
 }
