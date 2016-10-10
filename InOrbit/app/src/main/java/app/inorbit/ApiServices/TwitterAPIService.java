@@ -12,6 +12,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
@@ -23,13 +24,18 @@ import retrofit2.http.Query;
 public interface TwitterAPIService {
 
     @POST("oauth/request_token")
-    Call<ResponseBody> requestToken(@Header("Authorization") String oauthString
+    Call<ResponseBody> obtainRequestToken(@Header("Authorization") String authorizationHeader
     );
+
+    @GET("oauth/authenticate")
+    Call<ResponseBody> authenticateUser(
+            @Header("Authorization") String authorizationHeader,
+            @Query("oauth_token") String requestToken);
 
 
     @POST("oauth/access_token")
     Call<ResponseBody> convertToAccessToken(
-            @Header("Authorization") String oauthString,
+            @Header("Authorization") String authorizationHeader,
             @Query("oauth_verifier") String oauthVerifier);
 }
 

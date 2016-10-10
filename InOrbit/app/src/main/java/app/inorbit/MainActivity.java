@@ -19,19 +19,19 @@ public class MainActivity extends AppCompatActivity {
         // create a Client & Interceptor, pass it to api call methods in Endpoints
         OkHttpClient client = Endpoints.createClient();
 
-/*
+
         try {
             TempTwitterClass.connectTwitter(client,this);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-*/
+
 
 
         /*        THE FOLLOWING ENDPOINTS WORK:
         APOD, NYT, Guardian, LaunchLibrary, Where is the ISS       */
 
-        Endpoints.connectFlickr(client);
+//        Endpoints.connectFlickr(client);
 
 
 

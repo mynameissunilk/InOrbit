@@ -3,6 +3,7 @@ package app.inorbit.ApiServices;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.util.Base64;
 import android.util.Log;
 
@@ -18,8 +19,8 @@ import java.util.UUID;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import javax.security.auth.login.LoginException;
 
-import app.inorbit.MainActivity;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -29,7 +30,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class TempTwitterClass {
-    //it was just too much of a mess in the Endpoints class....
+    //it was just too much of a mess to put in the Endpoints class.... until i can sort it out and clean it up
 
     private static final String TAG = "TempTwitterClass";
 
@@ -38,17 +39,24 @@ public class TempTwitterClass {
     private static final String twitterConsumerSecret = "YSKdNHcy5n731hDrIreTpKMNWOrtgHJbgIpdS0USuxxm29Zj7m";
     public static final String twitterBaseURL = "https://api.twitter.com/";
     public static final String twitterRequestTokenEndpoint = "https://api.twitter.com/oauth/request_token";
-    public static String twitterRequestToken = "";
-    public static String twitterRequestTokenSecret = "";
-    public static String twitterAccessToken = "";
-    public static String twitterAccessTokenSecret = "";
-    public static String twitterOauthVerifier = "";
+    public static String twitterRequestToken = null;
+    public static String twitterRequestTokenSecret = null;
+    public static String twitterAccessToken = null;
+    public static String twitterAccessTokenSecret = null;
+    public static String twitterOauthVerifier = null;
+
+    //putting this up here to see if it solves the problem of how to put the signature in the param string
+    public static String signatureBaseString;
+    public static TwitterAPIService twitterService;
+    public static String authorizationHeader;
+    public static String oauthSignature;
 
 
     public static void connectTwitter(OkHttpClient client, final Context context) throws UnsupportedEncodingException {
         //gather ye parameters
         String uuidString = UUID.randomUUID().toString().replaceAll("-", "");
-        String oauthCallback = percentEncode("http://localhost");
+
+        String oauthCallback = encode("http://localhost");
         String oauthConsumerKey = twitterConsumerKey;
         String oauthNonce = uuidString;
         String oauthSignatureMethod = "HMAC-SHA1";
@@ -57,30 +65,43 @@ public class TempTwitterClass {
 
 
         //TODO figure out how you can use the signiture in the paramaterstring if the parameter string is necessary to generate the signature... ?
+
+        //for the first call to get request token, we don't have a signature yet so it's not in this auth header
         String parameterString =
                 "Oauth oauth_callback=" + oauthCallback +
                         "&oauth_consumer_key=" + oauthConsumerKey +
                         "&oauth_nonce=" + oauthNonce +
-//                        "&oauth_signature=" + generateTwitterSignature(signatureBaseString,twitterConsumerSecret+"&")+
+                        "&oauth_signature=" +oauthSignature +
+                        "&oauth_signature_method=" + oauthSignatureMethod +
+                        "&oauth_timestamp=" + oauthTimestamp +
+                        "&oauth_version=" + oauthVersion;
+
+        signatureBaseString = "POST&" + encode(twitterRequestTokenEndpoint) + "&" + encode(parameterString);
+
+        oauthSignature = generateTwitterSignature(signatureBaseString, twitterConsumerSecret + "&", twitterAccessTokenSecret);// note the & at the end. Normally the user access_token would go here, but we don't know it yet for request_token
+        Log.i(TAG, "OAUTH SIGNATURE: " + oauthSignature);
+
+        authorizationHeader =
+                "Oauth oauth_callback=" + oauthCallback +
+                        "&oauth_consumer_key=" + oauthConsumerKey +
+                        "&oauth_nonce=" + oauthNonce +
+                        "&oauth_signature=" + generateTwitterSignature(signatureBaseString, twitterConsumerSecret + "&", twitterAccessTokenSecret) +//inluding accesstokensecret because if it is null, my method accounts for that
                         "&oauth_signature_method=" + oauthSignatureMethod +
                         "&oauth_timestamp=" + oauthTimestamp +
                         "&oauth_version=" + oauthVersion;
 
 
-        String signatureBaseString = "POST&" + percentEncode(twitterRequestTokenEndpoint) + "&" + percentEncode(parameterString);
-        String oauthSignature = generateTwitterSignature(signatureBaseString, twitterConsumerSecret + "&", null);// note the & at the end. Normally the user access_token would go here, but we don't know it yet for request_token
-        Log.i(TAG, "OAUTH SIGNATURE: " + oauthSignature);
-
-
-        /** first up is getting the request_token **/
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(twitterBaseURL)
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        TwitterAPIService twitterService = retrofit.create(TwitterAPIService.class);
 
-        Call<ResponseBody> requestTokenCall = twitterService.requestToken(oauthSignature);
+        twitterService = retrofit.create(TwitterAPIService.class);
+
+
+        /** >>>>OBTAIN REQUEST_TOKEN<<<< **/
+        Call<ResponseBody> requestTokenCall = twitterService.obtainRequestToken(authorizationHeader);
         requestTokenCall.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -93,14 +114,19 @@ public class TempTwitterClass {
                         //verify it's good, store other values
                         twitterRequestToken = object.getString("oauth_token");
                         twitterRequestTokenSecret = object.getString("oauth_token_secret");
+                        Log.i(TAG, "TWITTER REQUEST TOKEN = "+ twitterRequestToken);
+
 
 
                         //now that we have the oauth token and secret,
-                        // we redirect the user to sign in via WebView to:
+                        /**>>>>REDIRECT USER TO SIGN IN<<<<**/
                         String authUrl = "https://api.twitter.com/oauth/authenticate?oauth_token=" + twitterRequestToken;
                         Intent intent = new Intent(Intent.ACTION_VIEW);
                         intent.setData(Uri.parse(authUrl));
                         context.startActivity(intent);
+
+                        /** >>>>AUTHENTICATE USER, GET OAUTH_VERIFIER<<<< **/
+                        authenticateUser(twitterRequestToken);
 
                     }
                 } catch (JSONException | IOException e) {
@@ -119,8 +145,45 @@ public class TempTwitterClass {
         });
 
 
-        /** convert request_token to access_token **/
-        Call<ResponseBody> getAccessToken = twitterService.convertToAccessToken(parameterString, twitterOauthVerifier);
+
+
+
+
+    }
+
+    public static void authenticateUser(final String requestToken){
+        Call<ResponseBody> authenticationCall = twitterService.authenticateUser(authorizationHeader,requestToken);
+        authenticationCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    JSONObject object = new JSONObject(response.body().string());
+                    Log.i(TAG, "AUTHENTICATEUSER: OAUTH TOKEN = "+ object.getString("oauth_token"));
+                    Log.i(TAG, "AUTHENTICATEUSER: request tkn = "+requestToken);
+                    if(requestToken.equals(object.getString("oauth_token"))){
+                        twitterOauthVerifier = object.getString("oauth_verifier");
+                        Log.i(TAG, "AUTHENTICATEUSER: OAUTH VERIFIER = "+twitterOauthVerifier);
+
+                        /**>>>>CONVERT REQUEST_TOKEN TO ACCESS_TOKEN<<<<**/
+                        convertToken(twitterOauthVerifier);
+                    }
+
+                } catch (JSONException | IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.d(TAG + "TWITTER", "AUTHENTICATEUSER CALL FAILED onFailure: " + t.getMessage());
+
+            }
+        });
+
+    }
+
+    public static void convertToken(String oauthVerifier){
+        Call<ResponseBody> getAccessToken = twitterService.convertToAccessToken(authorizationHeader, twitterOauthVerifier);
         Log.i(TAG, "TWITTER OAUTH VERIFIER = " + twitterOauthVerifier);
         getAccessToken.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -146,8 +209,10 @@ public class TempTwitterClass {
             }
         });
 
-
     }
+
+
+
 
 
     public static String generateTwitterSignature(String signatureBaseStr, String oauthConsumerSecret, String oauthTokenSecret) {
@@ -156,10 +221,10 @@ public class TempTwitterClass {
             Mac mac = Mac.getInstance("HmacSHA1");
             SecretKeySpec spec;
             if (oauthTokenSecret == null) {
-                String signingKey = percentEncode(oauthConsumerSecret) + "&";
+                String signingKey = encode(oauthConsumerSecret) + "&";
                 spec = new SecretKeySpec(signingKey.getBytes(), "HmacSHA1");
             } else {
-                String signingKey = percentEncode(oauthConsumerSecret) + "&" + percentEncode(oauthTokenSecret);
+                String signingKey = encode(oauthConsumerSecret) + "&" + encode(oauthTokenSecret);
                 spec = new SecretKeySpec(signingKey.getBytes(), "HmacSHA1");
             }
 
@@ -175,7 +240,8 @@ public class TempTwitterClass {
     }
 
 
-    private static String percentEncode(String value) {
+    @NonNull
+    private static String encode(String value) {
         String encoded = "";
         try {
             encoded = URLEncoder.encode(value, "UTF-8");
