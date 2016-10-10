@@ -2,6 +2,14 @@ package app.inorbit.ApiServices;
 
 import android.util.Log;
 
+import com.github.scribejava.apis.FlickrApi;
+import com.github.scribejava.core.builder.ServiceBuilder;
+import com.github.scribejava.core.model.OAuth1RequestToken;
+import com.github.scribejava.core.oauth.OAuth10aService;
+
+import java.io.IOException;
+
+import app.inorbit.Models.Flickr.ContentFlickr;
 import app.inorbit.Models.Guardian.ContentGuardian;
 import app.inorbit.Models.ISS.ContentISS;
 import app.inorbit.Models.LaunchLibrary.ContentLaunchLibrary;
@@ -71,12 +79,16 @@ public class Endpoints {
     private static final String flickrBaseURL = "https://api.flickr.com/services/";
     private static final String flickrKey = "ab85ab5194463ca32b34588c6bb881cc";
     private static final String flickrSecretKey = "f7cf4b2166d68879";
-    private static final String flickrAuthURL = "https://www.flickr.com/auth-72157674899282716";
+    //private static final String flickrAuthURL = "https://www.flickr.com/auth-72157674899282716";
+    private static final String nasaMarshall = "28634332@N05";
+    private static final String nasaJohnson = "29988733@N04";
+    // private static final String nasaKennedy = "108488366@N07";
+    // private static final String nasaCommons = "44494372@N05";
 
     // Pass the same client to each API Call
     public static OkHttpClient createClient(){
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS);
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(interceptor) // the logging interceptor
@@ -343,6 +355,7 @@ public class Endpoints {
     }
 
     public static void connectFlickr(OkHttpClient client){
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(flickrBaseURL)
                 .client(client)
@@ -350,16 +363,48 @@ public class Endpoints {
                 .build();
 
         FlickrAPIService flickrService = retrofit.create(FlickrAPIService.class);
-        Call<ResponseBody> tokenCall = flickrService.getRequestToken(flickrKey,"HMA-SHA1");
-        tokenCall.enqueue(new Callback<ResponseBody>() {
+
+        // Get NASA Johnson's photos
+        Call<ContentFlickr> johnsonPhotoCall = flickrService.getImages(
+                "flickr.people.getPublicPhotos",
+                flickrKey,
+                nasaJohnson,
+                20,
+                "json",
+                1
+        );
+        johnsonPhotoCall.enqueue(new Callback<ContentFlickr>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(Call<ContentFlickr> call, Response<ContentFlickr> response) {
                 if(response.isSuccessful())
-                    Log.i("SUCCESS<<<<<","SUCCESS");
+                    Log.i("NASA JOHNSON", ">>>>>SUCCESS");
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<ContentFlickr> call, Throwable t) {
+
+            }
+        });
+
+        //Get NASA Marshall's Photos
+        Call<ContentFlickr> marshallPhotoCall = flickrService.getImages(
+                "flickr.people.getPublicPhotos",
+                flickrKey,
+                nasaMarshall,
+                20,
+                "json",
+                1
+        );
+
+        marshallPhotoCall.enqueue(new Callback<ContentFlickr>() {
+            @Override
+            public void onResponse(Call<ContentFlickr> call, Response<ContentFlickr> response) {
+                if(response.isSuccessful())
+                    Log.i("NASA MARSHALL",">>>>>SUCCESS");
+            }
+
+            @Override
+            public void onFailure(Call<ContentFlickr> call, Throwable t) {
 
             }
         });
