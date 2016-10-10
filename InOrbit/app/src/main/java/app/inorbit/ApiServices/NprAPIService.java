@@ -1,6 +1,7 @@
 package app.inorbit.ApiServices;
 
 
+import app.inorbit.Models.NPR.ContentNPR;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -14,7 +15,7 @@ public interface NprAPIService {
 
 
     @GET("query")
-    Call<ResponseBody> getArticle(
+    Call<ContentNPR> getArticle(
             @Query("id") int id,
             @Query("fields") String fields,
             @Query("output") String output,

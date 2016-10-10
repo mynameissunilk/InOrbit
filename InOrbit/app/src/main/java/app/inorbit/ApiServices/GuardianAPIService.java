@@ -1,5 +1,6 @@
 package app.inorbit.ApiServices;
 
+import app.inorbit.Models.Guardian.ContentGuardian;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -11,7 +12,7 @@ import retrofit2.http.Query;
 // section=science&order-by=newest&q=NASA&api-key=KEY
 public interface GuardianAPIService {
      @GET("search")
-     Call<ResponseBody> getGuardianArticles(
+     Call<ContentGuardian> getGuardianArticles(
              @Query("section") String sectionName,
              @Query("order-by") String sortNewest,
              @Query("q") String query,

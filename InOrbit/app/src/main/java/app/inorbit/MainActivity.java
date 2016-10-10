@@ -19,13 +19,6 @@ public class MainActivity extends AppCompatActivity {
         // create a Client & Interceptor, pass it to api call methods in Endpoints
         OkHttpClient client = Endpoints.createClient();
 
-        /*
-        THE FOLLOWING ENDPOINTS WORK:
-        APOD, NYT, Guardian, LaunchLibrary, Where is the ISS
-        */
-
-        Endpoints.connectExtraVehicularActivity(client);
-
 /*
         try {
             TempTwitterClass.connectTwitter(client,this);
@@ -35,7 +28,11 @@ public class MainActivity extends AppCompatActivity {
 */
 
 
-        Endpoints.connectNeoService(client);
+        /*        THE FOLLOWING ENDPOINTS WORK:
+        APOD, NYT, Guardian, LaunchLibrary, Where is the ISS       */
+
+        Endpoints.connectFlickr(client);
+
 
 
     }
