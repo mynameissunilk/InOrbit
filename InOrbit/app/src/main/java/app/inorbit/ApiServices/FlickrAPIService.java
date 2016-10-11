@@ -1,5 +1,6 @@
 package app.inorbit.ApiServices;
 
+import app.inorbit.Models.Flickr.ContentFlickr;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -18,12 +19,12 @@ public interface FlickrAPIService {
     );
 
     @GET("rest")
-    Call<ResponseBody> getImages(
+    Call<ContentFlickr> getImages(
             @Query("method") String method, // flickr.people.getPhotos
-            @Query("api-key") String key,
-            @Query("user-id") String id,
-            @Query("content_type") int contentCode,
+            @Query("api_key") String key,
+            @Query("user_id") String id,
             @Query("per_page") int numPerPage,
-            @Query("format") String format // JSON
+            @Query("format") String format,
+            @Query("nojsoncallback") int nocallback// JSON
     );
 }

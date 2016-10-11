@@ -3,6 +3,7 @@ package app.inorbit.ApiServices;
 import android.util.Base64;
 import android.util.Log;
 
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -10,6 +11,15 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+
+import com.github.scribejava.apis.FlickrApi;
+import com.github.scribejava.core.builder.ServiceBuilder;
+import com.github.scribejava.core.model.OAuth1RequestToken;
+import com.github.scribejava.core.oauth.OAuth10aService;
+
+import java.io.IOException;
+
+import app.inorbit.Models.Flickr.ContentFlickr;
 import app.inorbit.Models.Guardian.ContentGuardian;
 import app.inorbit.Models.ISS.ContentISS;
 import app.inorbit.Models.LaunchLibrary.ContentLaunchLibrary;
@@ -83,12 +93,17 @@ public class Endpoints {
     private static final String flickrBaseURL = "https://api.flickr.com/services/";
     private static final String flickrKey = "ab85ab5194463ca32b34588c6bb881cc";
     private static final String flickrSecretKey = "f7cf4b2166d68879";
-    private static final String flickrAuthURL = "https://www.flickr.com/auth-72157674899282716";
+    //private static final String flickrAuthURL = "https://www.flickr.com/auth-72157674899282716";
+    private static final String nasaMarshall = "28634332@N05";
+    private static final String nasaJohnson = "29988733@N04";
+    // private static final String nasaKennedy = "108488366@N07";
+    // private static final String nasaCommons = "44494372@N05";
 
 
     // Pass the same client to each API Call
     public static OkHttpClient createClient() {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+
 //        interceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS);
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -372,6 +387,8 @@ public class Endpoints {
 
 
     public static void connectFlickr(OkHttpClient client) {
+
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(flickrBaseURL)
                 .client(client)
@@ -379,16 +396,49 @@ public class Endpoints {
                 .build();
 
         FlickrAPIService flickrService = retrofit.create(FlickrAPIService.class);
-        Call<ResponseBody> tokenCall = flickrService.getRequestToken(flickrKey, "HMA-SHA1");
-        tokenCall.enqueue(new Callback<ResponseBody>() {
+
+        // Get NASA Johnson's photos
+        Call<ContentFlickr> johnsonPhotoCall = flickrService.getImages(
+                "flickr.people.getPublicPhotos",
+                flickrKey,
+                nasaJohnson,
+                20,
+                "json",
+                1
+        );
+        johnsonPhotoCall.enqueue(new Callback<ContentFlickr>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            public void onResponse(Call<ContentFlickr> call, Response<ContentFlickr> response) {
                 if (response.isSuccessful())
-                    Log.i("SUCCESS<<<<<", "SUCCESS");
+                    Log.i("NASA JOHNSON", ">>>>>SUCCESS");
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<ContentFlickr> call, Throwable t) {
+
+            }
+        });
+
+        //Get NASA Marshall's Photos
+        Call<ContentFlickr> marshallPhotoCall = flickrService.getImages(
+                "flickr.people.getPublicPhotos",
+                flickrKey,
+                nasaMarshall,
+                20,
+                "json",
+                1
+        );
+
+        marshallPhotoCall.enqueue(new Callback<ContentFlickr>() {
+            @Override
+            public void onResponse(Call<ContentFlickr> call, Response<ContentFlickr> response) {
+                if (response.isSuccessful())
+                    Log.i("NASA MARSHALL", ">>>>>SUCCESS");
+
+            }
+
+            @Override
+            public void onFailure(Call<ContentFlickr> call, Throwable t) {
 
             }
         });
@@ -400,10 +450,10 @@ public class Endpoints {
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        TwitterAPIService twitterService = retrofit.create(TwitterAPIService.class);
+        final TwitterAPIService twitterService = retrofit.create(TwitterAPIService.class);
 
 
-        /**>>>FIRST we obtain the bearer token<<<**/
+        //prep for obtaining bearer token
         String notEncodedString = twitterConsumerKey + ":" + twitterConsumerSecret;
         byte[] data = new byte[0];
         try {
@@ -414,28 +464,78 @@ public class Endpoints {
         String encodedString = Base64.encodeToString(data, Base64.NO_WRAP);
 
 
+        // call to obtain bearer token
         Call<ResponseBody> authorizationCall = twitterService.authorizeApplication("Basic " + encodedString, "application/x-www-form-urlencoded;charset=UTF-8", "client_credentials");
         authorizationCall.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                Log.i(TAG + " TWITTER", "SUCCESS");
-                try {
-                    String responseString = response.body().string();
-                    Log.d(TAG + " TWITTER", "Bearer Token: " + responseString);
-                    JSONObject object = new JSONObject(responseString);
-                    String twitterAccessToken = object.getString("access_token");
-                    Log.d(TAG + " TWITTER", "Access Token: " + twitterAccessToken);
+                if (response.isSuccessful()) {
+
+                    Log.i(TAG + " TWITTER", "SUCCESS");
+                    try {
+                        String responseString = response.body().string();
+                        Log.d(TAG + " TWITTER", "Bearer Token: " + responseString);
+                        JSONObject object = new JSONObject(responseString);
+                        String twitterAccessToken = object.getString("access_token");
+                        Log.d(TAG + " TWITTER", "Access Token: " + twitterAccessToken);
 
 
-                    /**>>>>NEXT we do any GET request<<<<**/
-                    getTimeline(client, twitterAccessToken, "esaoperations",2);
-                    searchTweets(client,twitterAccessToken,"juno from:nasa",2);
-                    
+                        /**>>>>NEXT we do our GET requests<<<<**/
 
-                } catch (IOException | JSONException e) {
-                    e.printStackTrace();
+                        if (twitterAccessToken != null) {
+
+                            String screen_name = "esaoperations";
+                            String query = "juno from:nasa";
+
+
+                            //call to get tweets from user timeline by screen name
+                            Call<ResponseBody> getTweetsCall = twitterService.userTimeline("Bearer " + twitterAccessToken, screen_name, 5);
+                            getTweetsCall.enqueue(new Callback<ResponseBody>() {
+                                @Override
+                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                    if (response.isSuccessful()) {
+                                        Log.d(TAG + " TWITTER", "GET TIMELINE CALL SUCCESS!");
+                                        try {
+                                            Log.d(TAG + " TWITTER", "RESPONSE: " + response.body().string());
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                    Log.d(TAG + " TWITTER", "GET TIMELINE CALL FAILED: " + t.getMessage().toString());
+                                }
+                            });
+
+                            //call to search all tweets
+                            Call<ResponseBody> searchCall = twitterService.searchTweets("Bearer " + twitterAccessToken, query, "en", "mixed", 5);//mixed refers to popular and real time results
+                            searchCall.enqueue(new Callback<ResponseBody>() {
+                                @Override
+                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                    if (response.isSuccessful()) {
+                                        Log.d(TAG + " TWITTER", "SEARCH TWEETS CALL SUCCEEDED!!");
+                                        try {
+                                            Log.d(TAG + " TWITTER", "RESPONSE BODY: " + response.body().string());
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                    Log.d(TAG + " TWITTER", "SEARCH TWEETS CALL FAILED: " + t.getMessage().toString());
+
+                                }
+                            });
+
+                        }
+                    } catch (IOException | JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
-
             }
 
             @Override
@@ -447,72 +547,7 @@ public class Endpoints {
 
     }
 
-    /**  WHERE SHOULD THESE HELPER METHODS LIVE?  **/
-    public static void getTimeline(OkHttpClient client, String accessToken, String username, int count) {
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(twitterBaseURL)
-                .client(client)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        TwitterAPIService twitterService = retrofit.create(TwitterAPIService.class);
-
-
-        //and the auth header is passed Bearer instead of Basic this time, because we have it!
-        if (accessToken != null) {
-            Call<ResponseBody> getTweetsCall = twitterService.userTimeline("Bearer " + accessToken, username, count);
-            getTweetsCall.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    Log.d(TAG + " TWITTER", "GET TIMELINE CALL SUCCESS!");
-                    try {
-                        Log.d(TAG + " TWITTER", "RESPONSE: " + response.body().string());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    Log.d(TAG + " TWITTER", "GET TIMELINE CALL FAILED: " + t.getMessage().toString());
-                }
-            });
-        }
-    }
-
-    public static void searchTweets(OkHttpClient client, String accessToken, String query, int count) throws UnsupportedEncodingException {
-
-        query = URLEncoder.encode(query,"UTF-8");
-        Log.i(TAG + " TWITTER", "searchTweets: ENCODED QUERY IS: "+ query);
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(twitterBaseURL)
-                .client(client)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        TwitterAPIService twitterService = retrofit.create(TwitterAPIService.class);
-
-        if (accessToken != null) {
-            Call<ResponseBody> searchCall = twitterService.searchTweets("Bearer " + accessToken, query, "en", "mixed", count);//mixed refers to popular and real time results
-
-            searchCall.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    Log.d(TAG + " TWITTER", "SEARCH TWEETS CALL SUCCEEDED!!");
-                    try {
-                        Log.d(TAG+" TWITTER", "RESPONSE BODY: "+response.body().string());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    Log.d(TAG + " TWITTER", "SEARCH TWEETS CALL FAILED: " + t.getMessage().toString());
-
-                }
-            });
-        }
-
-    }
 }
 
 
