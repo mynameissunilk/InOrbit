@@ -34,10 +34,21 @@ public interface TwitterAPIService {
                                     @Query("screen_name") String screenName,
                                     @Query("count") int count);
 
+    @GET("1.1/search/tweets.json")
+    Call<ResponseBody> searchTweets(@Header("Authorization") String authorization,
+                                    @Query("q") String query,
+                                    @Query("lang")String language,
+                                    @Query("result_type") String searchResultType,
+                                    @Query("count") int count);
 
 
 
-    /* these are for the sign in auth */
+
+
+
+    /*
+    these are for the sign in auth
+
     @POST("oauth/request_token")
     Call<ResponseBody> obtainRequestToken(@Header("Authorization") String authorizationHeader
     );
@@ -51,7 +62,9 @@ public interface TwitterAPIService {
     @POST("oauth/access_token")
     Call<ResponseBody> convertToAccessToken(
             @Header("Authorization") String authorizationHeader,
-            @Query("oauth_verifier") String oauthVerifier);
+            @Body("oauth_verifier") String oauthVerifier);
+
+    */
 }
 
 

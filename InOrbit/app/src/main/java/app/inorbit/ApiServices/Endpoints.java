@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 import app.inorbit.Models.Guardian.ContentGuardian;
 import app.inorbit.Models.ISS.ContentISS;
@@ -73,14 +74,10 @@ public class Endpoints {
     //"73f5f97cf52247a7a83b9f24299a23e2";
 
     // Twitter
-    /**
-     * I registered a twitter app under my account to get key & secret
-     * where should these creds be put for security reasons?
-     **/
-    private static final String twitterConsumerKey = "AuUt4iH82LU1EYhfTfaxlIpWR";
-    private static final String twitterConsumerSecret = "YSKdNHcy5n731hDrIreTpKMNWOrtgHJbgIpdS0USuxxm29Zj7m";
+    private static final String twitterConsumerKey = "m937fzbpM0QUk5YVBh3nWE8zy";
+    private static final String twitterConsumerSecret = "9JaZzy4jOqkgH8QyYxy2VDYntl0oK3OAKbVB3NdRscRo4MtE13";
     private static final String twitterBaseURL = "https://api.twitter.com/";
-    private static String twitterAccessToken;
+
 
     // Flickr
     private static final String flickrBaseURL = "https://api.flickr.com/services/";
@@ -426,11 +423,14 @@ public class Endpoints {
                     String responseString = response.body().string();
                     Log.d(TAG + " TWITTER", "Bearer Token: " + responseString);
                     JSONObject object = new JSONObject(responseString);
-                    twitterAccessToken = object.getString("access_token");
+                    String twitterAccessToken = object.getString("access_token");
                     Log.d(TAG + " TWITTER", "Access Token: " + twitterAccessToken);
 
-                    /**>>>>NEXT we do the GET request<<<<**/
-                    getTweets(client, twitterAccessToken);
+
+                    /**>>>>NEXT we do any GET request<<<<**/
+                    getTimeline(client, twitterAccessToken, "esaoperations",2);
+                    searchTweets(client,twitterAccessToken,"juno from:nasa",2);
+                    
 
                 } catch (IOException | JSONException e) {
                     e.printStackTrace();
@@ -447,7 +447,8 @@ public class Endpoints {
 
     }
 
-    public static void getTweets(OkHttpClient client, String accessToken) {
+    /**  WHERE SHOULD THESE HELPER METHODS LIVE?  **/
+    public static void getTimeline(OkHttpClient client, String accessToken, String username, int count) {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(twitterBaseURL)
@@ -459,28 +460,58 @@ public class Endpoints {
 
         //and the auth header is passed Bearer instead of Basic this time, because we have it!
         if (accessToken != null) {
-            Call<ResponseBody> getTweetsCall = twitterService.userTimeline("Bearer " + accessToken, "NASA_Astronauts", 2);
+            Call<ResponseBody> getTweetsCall = twitterService.userTimeline("Bearer " + accessToken, username, count);
             getTweetsCall.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    Log.d(TAG + " TWITTER", "GET TWEETS CALL SUCCESS!");
-
+                    Log.d(TAG + " TWITTER", "GET TIMELINE CALL SUCCESS!");
                     try {
                         Log.d(TAG + " TWITTER", "RESPONSE: " + response.body().string());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
-
                 }
-
                 @Override
                 public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    Log.d(TAG + " TWITTER", "GET TWEETS CALL FAILED: " + t.getMessage().toString());
+                    Log.d(TAG + " TWITTER", "GET TIMELINE CALL FAILED: " + t.getMessage().toString());
+                }
+            });
+        }
+    }
+
+    public static void searchTweets(OkHttpClient client, String accessToken, String query, int count) throws UnsupportedEncodingException {
+
+        query = URLEncoder.encode(query,"UTF-8");
+        Log.i(TAG + " TWITTER", "searchTweets: ENCODED QUERY IS: "+ query);
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(twitterBaseURL)
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        TwitterAPIService twitterService = retrofit.create(TwitterAPIService.class);
+
+        if (accessToken != null) {
+            Call<ResponseBody> searchCall = twitterService.searchTweets("Bearer " + accessToken, query, "en", "mixed", count);//mixed refers to popular and real time results
+
+            searchCall.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    Log.d(TAG + " TWITTER", "SEARCH TWEETS CALL SUCCEEDED!!");
+                    try {
+                        Log.d(TAG+" TWITTER", "RESPONSE BODY: "+response.body().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Log.d(TAG + " TWITTER", "SEARCH TWEETS CALL FAILED: " + t.getMessage().toString());
 
                 }
             });
         }
+
     }
 }
 
