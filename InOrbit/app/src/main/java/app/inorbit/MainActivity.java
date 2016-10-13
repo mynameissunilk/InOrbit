@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
         Endpoints.connectTwitter(client);
 
+
         /*        THE FOLLOWING ENDPOINTS WORK:
         APOD, NYT, Guardian, LaunchLibrary, Where is the ISS       */
 

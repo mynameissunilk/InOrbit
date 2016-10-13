@@ -6,7 +6,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 @Generated("org.jsonschema2pojo")
-public class Tweet {
+public class ContentTwitter {
 
     @SerializedName("created_at")
     @Expose
@@ -99,7 +99,7 @@ public class Tweet {
         this.createdAt = createdAt;
     }
 
-    public Tweet withCreatedAt(String createdAt) {
+    public ContentTwitter withCreatedAt(String createdAt) {
         this.createdAt = createdAt;
         return this;
     }
@@ -122,7 +122,7 @@ public class Tweet {
         this.id = id;
     }
 
-    public Tweet withId(int id) {
+    public ContentTwitter withId(int id) {
         this.id = id;
         return this;
     }
@@ -145,7 +145,7 @@ public class Tweet {
         this.idStr = idStr;
     }
 
-    public Tweet withIdStr(String idStr) {
+    public ContentTwitter withIdStr(String idStr) {
         this.idStr = idStr;
         return this;
     }
@@ -168,7 +168,7 @@ public class Tweet {
         this.text = text;
     }
 
-    public Tweet withText(String text) {
+    public ContentTwitter withText(String text) {
         this.text = text;
         return this;
     }
@@ -191,7 +191,7 @@ public class Tweet {
         this.truncated = truncated;
     }
 
-    public Tweet withTruncated(boolean truncated) {
+    public ContentTwitter withTruncated(boolean truncated) {
         this.truncated = truncated;
         return this;
     }
@@ -214,7 +214,7 @@ public class Tweet {
         this.entities = entities;
     }
 
-    public Tweet withEntities(Entities entities) {
+    public ContentTwitter withEntities(Entities entities) {
         this.entities = entities;
         return this;
     }
@@ -237,7 +237,7 @@ public class Tweet {
         this.source = source;
     }
 
-    public Tweet withSource(String source) {
+    public ContentTwitter withSource(String source) {
         this.source = source;
         return this;
     }
@@ -260,7 +260,7 @@ public class Tweet {
         this.inReplyToStatusId = inReplyToStatusId;
     }
 
-    public Tweet withInReplyToStatusId(Object inReplyToStatusId) {
+    public ContentTwitter withInReplyToStatusId(Object inReplyToStatusId) {
         this.inReplyToStatusId = inReplyToStatusId;
         return this;
     }
@@ -283,7 +283,7 @@ public class Tweet {
         this.inReplyToStatusIdStr = inReplyToStatusIdStr;
     }
 
-    public Tweet withInReplyToStatusIdStr(Object inReplyToStatusIdStr) {
+    public ContentTwitter withInReplyToStatusIdStr(Object inReplyToStatusIdStr) {
         this.inReplyToStatusIdStr = inReplyToStatusIdStr;
         return this;
     }
@@ -306,7 +306,7 @@ public class Tweet {
         this.inReplyToUserId = inReplyToUserId;
     }
 
-    public Tweet withInReplyToUserId(Object inReplyToUserId) {
+    public ContentTwitter withInReplyToUserId(Object inReplyToUserId) {
         this.inReplyToUserId = inReplyToUserId;
         return this;
     }
@@ -329,7 +329,7 @@ public class Tweet {
         this.inReplyToUserIdStr = inReplyToUserIdStr;
     }
 
-    public Tweet withInReplyToUserIdStr(Object inReplyToUserIdStr) {
+    public ContentTwitter withInReplyToUserIdStr(Object inReplyToUserIdStr) {
         this.inReplyToUserIdStr = inReplyToUserIdStr;
         return this;
     }
@@ -352,7 +352,7 @@ public class Tweet {
         this.inReplyToScreenName = inReplyToScreenName;
     }
 
-    public Tweet withInReplyToScreenName(Object inReplyToScreenName) {
+    public ContentTwitter withInReplyToScreenName(Object inReplyToScreenName) {
         this.inReplyToScreenName = inReplyToScreenName;
         return this;
     }
@@ -375,7 +375,7 @@ public class Tweet {
         this.user = user;
     }
 
-    public Tweet withUser(User user) {
+    public ContentTwitter withUser(User user) {
         this.user = user;
         return this;
     }
@@ -398,7 +398,7 @@ public class Tweet {
         this.geo = geo;
     }
 
-    public Tweet withGeo(Object geo) {
+    public ContentTwitter withGeo(Object geo) {
         this.geo = geo;
         return this;
     }
@@ -421,7 +421,7 @@ public class Tweet {
         this.coordinates = coordinates;
     }
 
-    public Tweet withCoordinates(Object coordinates) {
+    public ContentTwitter withCoordinates(Object coordinates) {
         this.coordinates = coordinates;
         return this;
     }
@@ -444,7 +444,7 @@ public class Tweet {
         this.place = place;
     }
 
-    public Tweet withPlace(Object place) {
+    public ContentTwitter withPlace(Object place) {
         this.place = place;
         return this;
     }
@@ -467,7 +467,7 @@ public class Tweet {
         this.contributors = contributors;
     }
 
-    public Tweet withContributors(Object contributors) {
+    public ContentTwitter withContributors(Object contributors) {
         this.contributors = contributors;
         return this;
     }
@@ -490,7 +490,7 @@ public class Tweet {
         this.isQuoteStatus = isQuoteStatus;
     }
 
-    public Tweet withIsQuoteStatus(boolean isQuoteStatus) {
+    public ContentTwitter withIsQuoteStatus(boolean isQuoteStatus) {
         this.isQuoteStatus = isQuoteStatus;
         return this;
     }
@@ -513,7 +513,7 @@ public class Tweet {
         this.retweetCount = retweetCount;
     }
 
-    public Tweet withRetweetCount(int retweetCount) {
+    public ContentTwitter withRetweetCount(int retweetCount) {
         this.retweetCount = retweetCount;
         return this;
     }
@@ -536,7 +536,7 @@ public class Tweet {
         this.favoriteCount = favoriteCount;
     }
 
-    public Tweet withFavoriteCount(int favoriteCount) {
+    public ContentTwitter withFavoriteCount(int favoriteCount) {
         this.favoriteCount = favoriteCount;
         return this;
     }
@@ -559,7 +559,7 @@ public class Tweet {
         this.favorited = favorited;
     }
 
-    public Tweet withFavorited(boolean favorited) {
+    public ContentTwitter withFavorited(boolean favorited) {
         this.favorited = favorited;
         return this;
     }
@@ -582,7 +582,7 @@ public class Tweet {
         this.retweeted = retweeted;
     }
 
-    public Tweet withRetweeted(boolean retweeted) {
+    public ContentTwitter withRetweeted(boolean retweeted) {
         this.retweeted = retweeted;
         return this;
     }
@@ -605,7 +605,7 @@ public class Tweet {
         this.possiblySensitive = possiblySensitive;
     }
 
-    public Tweet withPossiblySensitive(boolean possiblySensitive) {
+    public ContentTwitter withPossiblySensitive(boolean possiblySensitive) {
         this.possiblySensitive = possiblySensitive;
         return this;
     }
@@ -628,7 +628,7 @@ public class Tweet {
         this.lang = lang;
     }
 
-    public Tweet withLang(String lang) {
+    public ContentTwitter withLang(String lang) {
         this.lang = lang;
         return this;
     }
