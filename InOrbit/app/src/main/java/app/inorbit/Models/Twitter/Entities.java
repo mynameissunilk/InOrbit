@@ -13,6 +13,27 @@ public class Entities {
     @Expose
     private List<Url> urls = new ArrayList<Url>();
 
+    @SerializedName("media")
+    @Expose
+    private List<Media> media = new ArrayList<Media>();
+
+    /**
+     *
+     * @return
+     * The urls
+     */
+    public List<Media> getMedia() {
+        return media;
+    }
+
+    /**
+     *
+     * @param urls
+     * The urls
+     */
+    public void setMedia(List<Media> media) {
+        this.media = media;
+    }
 
     /**
      *
@@ -36,5 +57,7 @@ public class Entities {
         this.urls = urls;
         return this;
     }
+
+
 
 }

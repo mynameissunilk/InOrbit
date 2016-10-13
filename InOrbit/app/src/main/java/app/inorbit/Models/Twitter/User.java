@@ -9,7 +9,7 @@ public class User {
 
     @SerializedName("id")
     @Expose
-    private int id;
+    private long id;
     @SerializedName("id_str")
     @Expose
     private String idStr;
@@ -136,7 +136,7 @@ public class User {
      * @return
      * The id
      */
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -145,7 +145,7 @@ public class User {
      * @param id
      * The id
      */
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

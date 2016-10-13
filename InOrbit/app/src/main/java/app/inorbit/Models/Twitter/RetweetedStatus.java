@@ -5,7 +5,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 @Generated("org.jsonschema2pojo")
-public class ContentTwitter {
+public class RetweetedStatus {
 
     @SerializedName("created_at")
     @Expose
@@ -24,7 +24,7 @@ public class ContentTwitter {
     private boolean truncated;
     @SerializedName("entities")
     @Expose
-    private Entities entities;
+    private Entities__ entities;
     @SerializedName("source")
     @Expose
     private String source;
@@ -45,7 +45,7 @@ public class ContentTwitter {
     private Object inReplyToScreenName;
     @SerializedName("user")
     @Expose
-    private User user;
+    private User_ user;
     @SerializedName("geo")
     @Expose
     private Object geo;
@@ -58,9 +58,6 @@ public class ContentTwitter {
     @SerializedName("contributors")
     @Expose
     private Object contributors;
-    @SerializedName("retweeted_status")
-    @Expose
-    private RetweetedStatus retweetedStatus;
     @SerializedName("is_quote_status")
     @Expose
     private boolean isQuoteStatus;
@@ -76,6 +73,9 @@ public class ContentTwitter {
     @SerializedName("retweeted")
     @Expose
     private boolean retweeted;
+    @SerializedName("possibly_sensitive")
+    @Expose
+    private boolean possiblySensitive;
     @SerializedName("lang")
     @Expose
     private String lang;
@@ -175,7 +175,7 @@ public class ContentTwitter {
      * @return
      * The entities
      */
-    public Entities getEntities() {
+    public Entities__ getEntities() {
         return entities;
     }
 
@@ -184,9 +184,9 @@ public class ContentTwitter {
      * @param entities
      * The entities
      */
-    public void setEntities(Entities entities) {
-        this.entities = entities;
-    }
+//    public void setEntities(Entities__ entities) {
+//        this.entities = entities;
+//    }
 
     /**
      *
@@ -301,7 +301,7 @@ public class ContentTwitter {
      * @return
      * The user
      */
-    public User getUser() {
+    public User_ getUser() {
         return user;
     }
 
@@ -310,7 +310,7 @@ public class ContentTwitter {
      * @param user
      * The user
      */
-    public void setUser(User user) {
+    public void setUser(User_ user) {
         this.user = user;
     }
 
@@ -384,24 +384,6 @@ public class ContentTwitter {
      */
     public void setContributors(Object contributors) {
         this.contributors = contributors;
-    }
-
-    /**
-     *
-     * @return
-     * The retweetedStatus
-     */
-    public RetweetedStatus getRetweetedStatus() {
-        return retweetedStatus;
-    }
-
-    /**
-     *
-     * @param retweetedStatus
-     * The retweeted_status
-     */
-    public void setRetweetedStatus(RetweetedStatus retweetedStatus) {
-        this.retweetedStatus = retweetedStatus;
     }
 
     /**
@@ -492,6 +474,24 @@ public class ContentTwitter {
      */
     public void setRetweeted(boolean retweeted) {
         this.retweeted = retweeted;
+    }
+
+    /**
+     *
+     * @return
+     * The possiblySensitive
+     */
+    public boolean isPossiblySensitive() {
+        return possiblySensitive;
+    }
+
+    /**
+     *
+     * @param possiblySensitive
+     * The possibly_sensitive
+     */
+    public void setPossiblySensitive(boolean possiblySensitive) {
+        this.possiblySensitive = possiblySensitive;
     }
 
     /**

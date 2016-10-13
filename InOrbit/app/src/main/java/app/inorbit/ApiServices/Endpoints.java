@@ -4,22 +4,14 @@ import android.util.Base64;
 import android.util.Log;
 
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 
-import com.github.scribejava.apis.FlickrApi;
-import com.github.scribejava.core.builder.ServiceBuilder;
-import com.github.scribejava.core.model.OAuth1RequestToken;
-import com.github.scribejava.core.oauth.OAuth10aService;
-
-import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 import app.inorbit.Models.Flickr.ContentFlickr;
 import app.inorbit.Models.Guardian.ContentGuardian;
@@ -30,6 +22,10 @@ import app.inorbit.Models.NASAMeteor.ContentNASAMeteor;
 import app.inorbit.Models.NASANEO.ContentNASANEO;
 import app.inorbit.Models.NPR.ContentNPR;
 import app.inorbit.Models.NYT.ContentNYT;
+import app.inorbit.Models.Twitter.ContentTwitter;
+import app.inorbit.Models.Twitter.Tweet;
+import app.inorbit.Models.Twitter.User;
+import app.inorbit.Models.Twitter.User_;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -476,46 +472,89 @@ public class Endpoints {
 
                     Log.i(TAG + " TWITTER", "SUCCESS");
                     try {
-                        String responseString = response.body().string();
+                        final String responseString = response.body().string();
                         Log.d(TAG + " TWITTER", "Bearer Token: " + responseString);
                         JSONObject object = new JSONObject(responseString);
                         String twitterAccessToken = object.getString("access_token");
                         Log.d(TAG + " TWITTER", "Access Token: " + twitterAccessToken);
 
 
-                        /**>>>>NEXT we do our GET requests<<<<**/
-
                         if (twitterAccessToken != null) {
-
 
                             //calls to space agencies for "home page"
                             //@NASA
-                           Call<ResponseBody> nasaCall = twitterService.userTimeline("Bearer " + twitterAccessToken, "nasa", 3);
-                            nasaCall.enqueue(new Callback<ResponseBody>() {
+                            Call<List<ContentTwitter>> nasaCall = twitterService.userTimeline("Bearer " + twitterAccessToken, "nasa", 3);
+                            nasaCall.enqueue(new Callback<List<ContentTwitter>>() {
                                 @Override
-                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                public void onResponse(Call<List<ContentTwitter>> call, Response<List<ContentTwitter>> response) {
                                     if (response.isSuccessful()) {
                                         Log.d(TAG + " TWITTER", "GET TIMELINE CALL SUCCESS!");
-                                        try {
-                                            String responseString = response.body().string();
-                                            Log.d(TAG + " TWITTER", "RESPONSE: " + responseString);
 
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
+                                        for (int i = 0; i < response.body().size(); i++) {
+
+                                            String id = null;
+                                            String text = null;
+                                            String date = null;
+                                            String statusUrl = null;
+                                            String mediaUrl = null;
+                                            User user = null;
+                                            User_ user_= null;
+
+                                            if (response.body().get(i).isRetweeted()) {
+                                                id = response.body().get(i).getRetweetedStatus().getIdStr();
+                                                text = response.body().get(i).getRetweetedStatus().getText();
+                                                date = response.body().get(i).getRetweetedStatus().getCreatedAt();
+                                                if (response.body().get(i).getRetweetedStatus().getEntities().getUrls().size() > 0) {
+                                                    statusUrl = response.body().get(i).getRetweetedStatus().getEntities().getUrls().get(0).getExpandedUrl();
+                                                }
+                                                if(response.body().get(i).getRetweetedStatus().getEntities().getMedia().size()>0){
+                                                     mediaUrl = response.body().get(i).getRetweetedStatus().getEntities().getMedia().get(0).getMediaUrl();
+                                                }
+                                                user_ = response.body().get(i).getRetweetedStatus().getUser();
+
+                                            } else if (!response.body().get(i).isRetweeted()) {
+
+                                                id = response.body().get(i).getIdStr();
+                                                text = response.body().get(i).getText();
+                                                date = response.body().get(i).getCreatedAt();
+                                                if (response.body().get(i).getEntities().getUrls().size() > 0) {
+                                                    statusUrl = response.body().get(i).getEntities().getUrls().get(0).getExpandedUrl();
+                                                }
+                                                if(response.body().get(i).getEntities().getMedia().size()>0){
+                                                    mediaUrl = response.body().get(i).getEntities().getMedia().get(0).getMediaUrl();
+                                                }
+                                                user = response.body().get(i).getUser();
+
+                                            }
+
+                                            Tweet tweet = new Tweet(id, text, date, statusUrl, mediaUrl, user, user_);
+                                            //add it to whatever list from here
+                                            
+                                            Log.i(TAG, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>TWEET OBJECT TEXT: " + tweet.getText());
+                                            Log.i(TAG, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>TWEET OBJECT MEDIAURL: " + tweet.getMediaUrl());
+                                            Log.i(TAG, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>TWEET OBJECT USERNAME: " + tweet.getUser().getScreenName());
+
+                                            if(tweet.getUser_()!=null){
+                                                Log.i(TAG, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>RETWEET OBJECT USERNAME: " + tweet.getUser_().getScreenName());
+                                            }
+
+
+
+
                                         }
+
                                     }
                                 }
 
                                 @Override
-                                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                public void onFailure(Call<List<ContentTwitter>> call, Throwable t) {
                                     Log.d(TAG + " TWITTER", "GET TIMELINE CALL FAILED: " + t.getMessage().toString());
                                 }
                             });
 
 
-
                             //@ESAoperations
-                            Call<ResponseBody> esaCall = twitterService.userTimeline("Bearer " + twitterAccessToken, "esaoperations", 3);
+                  /*          Call<ResponseBody> esaCall = twitterService.userTimeline("Bearer " + twitterAccessToken, "esaoperations", 3);
                             esaCall.enqueue(new Callback<ResponseBody>() {
                                 @Override
                                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {

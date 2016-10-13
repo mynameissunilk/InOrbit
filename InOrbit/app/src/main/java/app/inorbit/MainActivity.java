@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         OkHttpClient client = Endpoints.createClient();
 
         Endpoints.connectTwitter(client);
-
+//            Endpoints.connectNYT(client);
 
         /*        THE FOLLOWING ENDPOINTS WORK:
         APOD, NYT, Guardian, LaunchLibrary, Where is the ISS       */

@@ -1,15 +1,8 @@
 package app.inorbit.ApiServices;
 
-import android.util.Base64;
+import java.util.List;
 
-import java.net.URLEncoder;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.UUID;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
+import app.inorbit.Models.Twitter.ContentTwitter;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -30,14 +23,14 @@ public interface TwitterAPIService {
                                             @Query("grant_type") String grantType);
 
     @GET("1.1/statuses/user_timeline.json")
-    Call<ResponseBody> userTimeline(@Header("Authorization") String authorization,
-                                    @Query("screen_name") String screenName,
-                                    @Query("count") int count);
+    Call<List<ContentTwitter>> userTimeline(@Header("Authorization") String authorization,
+                                             @Query("screen_name") String screenName,
+                                             @Query("count") int count);
 
     @GET("1.1/search/tweets.json")
     Call<ResponseBody> searchTweets(@Header("Authorization") String authorization,
                                     @Query("q") String query,
-                                    @Query("lang")String language,
+                                    @Query("lang") String language,
                                     @Query("result_type") String searchResultType,
                                     @Query("count") int count);
 
