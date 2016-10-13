@@ -4,6 +4,7 @@ import android.util.Base64;
 import android.util.Log;
 
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,6 +19,7 @@ import com.github.scribejava.core.model.OAuth1RequestToken;
 import com.github.scribejava.core.oauth.OAuth10aService;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import app.inorbit.Models.Flickr.ContentFlickr;
 import app.inorbit.Models.Guardian.ContentGuardian;
@@ -444,6 +446,7 @@ public class Endpoints {
         });
     }
 
+
     public static void connectTwitter(final OkHttpClient client) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(twitterBaseURL)
@@ -484,19 +487,19 @@ public class Endpoints {
 
                         if (twitterAccessToken != null) {
 
-                            String screen_name = "esaoperations";
-                            String query = "juno from:nasa";
 
-
-                            //call to get tweets from user timeline by screen name
-                            Call<ResponseBody> getTweetsCall = twitterService.userTimeline("Bearer " + twitterAccessToken, screen_name, 5);
-                            getTweetsCall.enqueue(new Callback<ResponseBody>() {
+                            //calls to space agencies for "home page"
+                            //@NASA
+                           Call<ResponseBody> nasaCall = twitterService.userTimeline("Bearer " + twitterAccessToken, "nasa", 3);
+                            nasaCall.enqueue(new Callback<ResponseBody>() {
                                 @Override
                                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                                     if (response.isSuccessful()) {
                                         Log.d(TAG + " TWITTER", "GET TIMELINE CALL SUCCESS!");
                                         try {
-                                            Log.d(TAG + " TWITTER", "RESPONSE: " + response.body().string());
+                                            String responseString = response.body().string();
+                                            Log.d(TAG + " TWITTER", "RESPONSE: " + responseString);
+
                                         } catch (IOException e) {
                                             e.printStackTrace();
                                         }
@@ -509,8 +512,101 @@ public class Endpoints {
                                 }
                             });
 
+
+
+                            //@ESAoperations
+                            Call<ResponseBody> esaCall = twitterService.userTimeline("Bearer " + twitterAccessToken, "esaoperations", 3);
+                            esaCall.enqueue(new Callback<ResponseBody>() {
+                                @Override
+                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                    if (response.isSuccessful()) {
+                                        Log.d(TAG + " TWITTER", "GET TIMELINE CALL SUCCESS!");
+                                        try {
+                                            Log.d(TAG + " TWITTER", "RESPONSE: " + response.body().string());
+
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                    Log.d(TAG + " TWITTER", "GET TIMELINE CALL FAILED: " + t.getMessage().toString());
+                                }
+                            });
+
+
+                            //use this one on the LaunchLibrary page, perhaps?
+                            //@NASA_astronauts
+                            Call<ResponseBody> nasaAstronautsCall = twitterService.userTimeline("Bearer " + twitterAccessToken, "nasa_astronauts", 3);
+                            nasaAstronautsCall.enqueue(new Callback<ResponseBody>() {
+                                @Override
+                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                    if (response.isSuccessful()) {
+                                        Log.d(TAG + " TWITTER", "GET TIMELINE CALL SUCCESS!");
+                                        try {
+                                            Log.d(TAG + " TWITTER", "RESPONSE: " + response.body().string());
+
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                    Log.d(TAG + " TWITTER", "GET TIMELINE CALL FAILED: " + t.getMessage().toString());
+                                }
+                            });
+
+                            //@astro_jeff
+                            Call<ResponseBody> astroJeffCall = twitterService.userTimeline("Bearer " + twitterAccessToken, "astro_jeff", 3);
+                            astroJeffCall.enqueue(new Callback<ResponseBody>() {
+                                @Override
+                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                    if (response.isSuccessful()) {
+                                        Log.d(TAG + " TWITTER", "GET TIMELINE CALL SUCCESS!");
+                                        try {
+                                            Log.d(TAG + " TWITTER", "RESPONSE: " + response.body().string());
+
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                    Log.d(TAG + " TWITTER", "GET TIMELINE CALL FAILED: " + t.getMessage().toString());
+                                }
+                            });
+
+                            //@astro_kate7
+                            Call<ResponseBody> astroKateCall = twitterService.userTimeline("Bearer " + twitterAccessToken, "astro_kate7", 3);
+                            astroKateCall.enqueue(new Callback<ResponseBody>() {
+                                @Override
+                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                    if (response.isSuccessful()) {
+                                        Log.d(TAG + " TWITTER", "GET TIMELINE CALL SUCCESS!");
+                                        try {
+                                            Log.d(TAG + " TWITTER", "RESPONSE: " + response.body().string());
+
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                    Log.d(TAG + " TWITTER", "GET TIMELINE CALL FAILED: " + t.getMessage().toString());
+                                }
+                            });
+
+
                             //call to search all tweets
-                            Call<ResponseBody> searchCall = twitterService.searchTweets("Bearer " + twitterAccessToken, query, "en", "mixed", 5);//mixed refers to popular and real time results
+                            /*Call<ResponseBody> searchCall = twitterService.searchTweets("Bearer " + twitterAccessToken, query, "en", "mixed", 5);//mixed refers to popular and real time results
                             searchCall.enqueue(new Callback<ResponseBody>() {
                                 @Override
                                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -529,7 +625,7 @@ public class Endpoints {
                                     Log.d(TAG + " TWITTER", "SEARCH TWEETS CALL FAILED: " + t.getMessage().toString());
 
                                 }
-                            });
+                            });*/
 
                         }
                     } catch (IOException | JSONException e) {

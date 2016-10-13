@@ -4,6 +4,12 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.github.scribejava.apis.FlickrApi;
 import com.github.scribejava.core.builder.ServiceBuilder;
@@ -33,16 +39,14 @@ public class MainActivity extends AppCompatActivity {
 
         Endpoints.connectTwitter(client);
 
-
-
         /*        THE FOLLOWING ENDPOINTS WORK:
         APOD, NYT, Guardian, LaunchLibrary, Where is the ISS       */
 
 //        Endpoints.connectFlickr(client);
 
 
-
     }
+
 
     private class getFlickrToken extends AsyncTask<Void,Void,Void>{
 
