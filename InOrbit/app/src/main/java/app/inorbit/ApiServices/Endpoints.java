@@ -498,7 +498,7 @@ public class Endpoints {
                                             String statusUrl = null;
                                             String mediaUrl = null;
                                             User user = null;
-                                            User_ user_= null;
+                                            User_ user_ = null;
 
                                             if (response.body().get(i).isRetweeted()) {
                                                 id = response.body().get(i).getRetweetedStatus().getIdStr();
@@ -507,8 +507,8 @@ public class Endpoints {
                                                 if (response.body().get(i).getRetweetedStatus().getEntities().getUrls().size() > 0) {
                                                     statusUrl = response.body().get(i).getRetweetedStatus().getEntities().getUrls().get(0).getExpandedUrl();
                                                 }
-                                                if(response.body().get(i).getRetweetedStatus().getEntities().getMedia().size()>0){
-                                                     mediaUrl = response.body().get(i).getRetweetedStatus().getEntities().getMedia().get(0).getMediaUrl();
+                                                if (response.body().get(i).getRetweetedStatus().getEntities().getMedia().size() > 0) {
+                                                    mediaUrl = response.body().get(i).getRetweetedStatus().getEntities().getMedia().get(0).getMediaUrl();
                                                 }
                                                 user_ = response.body().get(i).getRetweetedStatus().getUser();
 
@@ -520,7 +520,7 @@ public class Endpoints {
                                                 if (response.body().get(i).getEntities().getUrls().size() > 0) {
                                                     statusUrl = response.body().get(i).getEntities().getUrls().get(0).getExpandedUrl();
                                                 }
-                                                if(response.body().get(i).getEntities().getMedia().size()>0){
+                                                if (response.body().get(i).getEntities().getMedia().size() > 0) {
                                                     mediaUrl = response.body().get(i).getEntities().getMedia().get(0).getMediaUrl();
                                                 }
                                                 user = response.body().get(i).getUser();
@@ -529,16 +529,15 @@ public class Endpoints {
 
                                             Tweet tweet = new Tweet(id, text, date, statusUrl, mediaUrl, user, user_);
                                             //add it to whatever list from here
-                                            
+
+
                                             Log.i(TAG, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>TWEET OBJECT TEXT: " + tweet.getText());
                                             Log.i(TAG, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>TWEET OBJECT MEDIAURL: " + tweet.getMediaUrl());
                                             Log.i(TAG, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>TWEET OBJECT USERNAME: " + tweet.getUser().getScreenName());
 
-                                            if(tweet.getUser_()!=null){
+                                            if (tweet.getUser_() != null) {
                                                 Log.i(TAG, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>RETWEET OBJECT USERNAME: " + tweet.getUser_().getScreenName());
                                             }
-
-
 
 
                                         }
